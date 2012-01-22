@@ -1,0 +1,9 @@
+name: dynmap
+version: "${project.version}-${BUILD_NUMBER}"
+descripton: Dynamic map for Spout - provides Google Maps style web site for Spout server
+authors: [ mikeprimm, FrozenCow ]
+
+main: org.dynmap.spout.DynmapPlugin
+load: startup
+
+platform: BOTH
