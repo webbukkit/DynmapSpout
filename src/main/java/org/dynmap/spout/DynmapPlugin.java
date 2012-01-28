@@ -101,6 +101,7 @@ public class DynmapPlugin extends CommonPlugin implements DynmapCommonAPI {
         }
 
         public <T> Future<T> callSyncMethod(final Callable<T> task) {
+            Log.info("callSyncMethod()");
             final FutureTask<T> ft = new FutureTask<T>(task);
             final Object o = new Object();
             synchronized(o) {
@@ -117,6 +118,7 @@ public class DynmapPlugin extends CommonPlugin implements DynmapCommonAPI {
                 });
                 try { o.wait(); } catch (InterruptedException ix) {}
             }
+            Log.info("callSyncMethod() done");
             return ft;
         }
 
@@ -405,7 +407,9 @@ public class DynmapPlugin extends CommonPlugin implements DynmapCommonAPI {
                 else {
                     dsender = new SpoutCommandSender(sender);
                 }
-                if(!core.processCommand(dsender, "dynmap", "dynmap", args))
+                String[] cmdargs = new String[args.length-1];
+                System.arraycopy(args, 1, cmdargs, 0, cmdargs.length);
+                if(!core.processCommand(dsender, args[0], "dynmap", cmdargs))
                     throw new CommandException("Bad Command");
                 
             } });

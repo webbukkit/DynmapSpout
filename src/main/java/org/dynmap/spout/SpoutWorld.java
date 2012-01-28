@@ -7,6 +7,7 @@ import java.util.List;
 import org.dynmap.DynmapChunk;
 import org.dynmap.DynmapLocation;
 import org.dynmap.DynmapWorld;
+import org.dynmap.Log;
 import org.dynmap.utils.MapChunkCache;
 import org.spout.api.geo.World;
 import org.spout.api.geo.discrete.Pointm;
@@ -47,6 +48,7 @@ public class SpoutWorld extends DynmapWorld {
             dloc.x = p.getX(); dloc.y = p.getY();
             dloc.z = p.getZ(); dloc.world = getName();
         }
+        Log.info("spawn=" + dloc.toString());
         return dloc;
     }
     /* Get world time */
@@ -102,6 +104,7 @@ public class SpoutWorld extends DynmapWorld {
      */
     @Override
     public String getEnvironment() {
+        Log.info("env=" + env);
         return env;
     }
     /**
@@ -109,10 +112,11 @@ public class SpoutWorld extends DynmapWorld {
      */
     @Override
     public MapChunkCache getChunkCache(List<DynmapChunk> chunks) {
-//TODO        NewMapChunkCache c = new NewMapChunkCache();
-//TODO        c.setChunks(this, chunks);
-//TODO        return c;
-        return null;
+        Log.info("getChunkCache");
+        SpoutMapChunkCache c = new SpoutMapChunkCache();
+        c.setChunks(this, chunks);
+        Log.info("isempty=" + c.isEmpty() + ", done=" + c.isDoneLoading());
+        return c;
     }
     
     public World getWorld() {
