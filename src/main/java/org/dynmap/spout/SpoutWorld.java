@@ -48,7 +48,6 @@ public class SpoutWorld extends DynmapWorld {
             dloc.x = p.getX(); dloc.y = p.getY();
             dloc.z = p.getZ(); dloc.world = getName();
         }
-        Log.info("spawn=" + dloc.toString());
         return dloc;
     }
     /* Get world time */
@@ -104,7 +103,6 @@ public class SpoutWorld extends DynmapWorld {
      */
     @Override
     public String getEnvironment() {
-        Log.info("env=" + env);
         return env;
     }
     /**
@@ -112,10 +110,8 @@ public class SpoutWorld extends DynmapWorld {
      */
     @Override
     public MapChunkCache getChunkCache(List<DynmapChunk> chunks) {
-        Log.info("getChunkCache");
         SpoutMapChunkCache c = new SpoutMapChunkCache();
         c.setChunks(this, chunks);
-        Log.info("isempty=" + c.isEmpty() + ", done=" + c.isDoneLoading());
         return c;
     }
     

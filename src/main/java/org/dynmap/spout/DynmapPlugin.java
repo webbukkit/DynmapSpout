@@ -101,7 +101,6 @@ public class DynmapPlugin extends CommonPlugin implements DynmapCommonAPI {
         }
 
         public <T> Future<T> callSyncMethod(final Callable<T> task) {
-            Log.info("callSyncMethod()");
             final FutureTask<T> ft = new FutureTask<T>(task);
             final Object o = new Object();
             synchronized(o) {
@@ -118,7 +117,6 @@ public class DynmapPlugin extends CommonPlugin implements DynmapCommonAPI {
                 });
                 try { o.wait(); } catch (InterruptedException ix) {}
             }
-            Log.info("callSyncMethod() done");
             return ft;
         }
 
@@ -383,7 +381,6 @@ public class DynmapPlugin extends CommonPlugin implements DynmapCommonAPI {
             public void run() {
                 /* Initialized the currently loaded worlds */
                 for (World world : game.getWorlds()) {
-                    Log.info("initial load = " + world.getName());
                     SpoutWorld w = new SpoutWorld(world);
                     if(core.processWorldLoad(w))    /* Have core process load first - fire event listeners if good load after */
                         core.listenerManager.processWorldEvent(EventType.WORLD_LOAD, w);

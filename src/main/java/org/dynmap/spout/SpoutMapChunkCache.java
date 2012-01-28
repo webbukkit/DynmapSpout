@@ -250,21 +250,12 @@ public class SpoutMapChunkCache implements MapChunkCache {
             return z;
         }
         public final int getBlockTypeIDAt(BlockStep s) {
-            switch(s) {
-                case Y_MINUS:
-                    return w.getBlock(x, y-1, z).getBlockId();
-                case Y_PLUS:
-                    return w.getBlock(x, y+1, z).getBlockId();
-                case X_MINUS:
-                    return w.getBlock(x-1, y, z).getBlockId();
-                case X_PLUS:
-                    return w.getBlock(x+1, y, z).getBlockId();
-                case Z_MINUS:
-                    return w.getBlock(x, y, z-1).getBlockId();
-                case Z_PLUS:
-                    return w.getBlock(x, y, z+1).getBlockId();
-            }
-            return 0;
+            BlockStep ls = laststep;
+            stepPosition(s);
+            int tid = snap.getRawArray()[(bx<<8)|(bz<<4)|by];
+            unstepPosition();
+            laststep = ls;
+            return tid;
         }
         public BlockStep getLastStep() {
             return laststep;
