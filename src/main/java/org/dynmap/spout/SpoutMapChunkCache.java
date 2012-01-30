@@ -3,6 +3,7 @@ package org.dynmap.spout;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Set;
 
 import org.dynmap.DynmapChunk;
 import org.dynmap.DynmapCore;
@@ -12,7 +13,11 @@ import org.dynmap.common.BiomeMap;
 import org.dynmap.utils.MapChunkCache;
 import org.dynmap.utils.MapIterator;
 import org.dynmap.utils.MapIterator.BlockStep;
+import org.spout.api.entity.Entity;
 import org.spout.api.geo.World;
+import org.spout.api.geo.cuboid.ChunkSnapshot;
+import org.spout.api.geo.cuboid.Region;
+import org.spout.api.material.BlockMaterial;
 import org.spout.api.util.cuboid.CuboidShortBuffer;
 
 /**
@@ -27,9 +32,9 @@ public class SpoutMapChunkCache implements MapChunkCache {
     private boolean isempty = true;
     private int x_min, x_max, y_min, y_max, z_min, z_max;
     private int x_dim, xz_dim;
-    private CuboidShortBuffer[] snaparray; /* Index = (x-x_min) + ((z-z_min)*x_dim) + ((y-ymin)*xz_dom) */
+    private ChunkSnapshot[] snaparray; /* Index = (x-x_min) + ((z-z_min)*x_dim) + ((y-ymin)*xz_dom) */
     private List<DynmapChunk> chunks;
-    private CuboidShortBuffer EMPTY;
+    private ChunkSnapshot EMPTY;
     
     private int chunks_read;    /* Number of chunks actually loaded */
     private int chunks_attempted;   /* Number of chunks attempted to load */
@@ -46,7 +51,9 @@ public class SpoutMapChunkCache implements MapChunkCache {
     public class OurMapIterator implements MapIterator {
         private int x, y, z;  
         private int chunkindex, bx, by, bz, off;  
-        private CuboidShortBuffer snap;
+        private ChunkSnapshot snap;
+        private short[] snapids;
+        private short[] snapdata;
         private BlockStep laststep;
         private int typeid = -1;
         private int highest = -1;
@@ -62,20 +69,21 @@ public class SpoutMapChunkCache implements MapChunkCache {
             this.by = y0 & 0xF;
             this.bz = z0 & 0xF;
             this.chunkindex = ((x >> 4) - x_min) + (((z >> 4) - z_min) * x_dim) + ((y >> 4) * xz_dim);
-            this.off = bx + (bz << 4);
+            this.off = (bx<<8) + (bz << 4) + by;
             snap = getSnap(x, y, z);
+            snapids = snap.getBlockIds();
+            snapdata = snap.getBlockData();
             laststep = BlockStep.Y_MINUS;
             highest = -1;
             typeid = -1;
         }
         public final int getBlockTypeID() {
-            return snap.getRawArray()[(bx<<8)|(bz<<4)|by];
+            return snapids[off];
         }
         public final int getBlockData() {
-//TODO            return blk.getBlockMaterial().getData();
-            return 0;
+            return snapdata[off];
         }
-        private final CuboidShortBuffer getSnap(int x, int y, int z) {
+        private final ChunkSnapshot getSnap(int x, int y, int z) {
             int idx = ((x>>4) - x_min) + (((z >> 4) - z_min) * x_dim) + ((y >> 4) * xz_dim);
             try {
                 return snaparray[idx];
@@ -86,12 +94,14 @@ public class SpoutMapChunkCache implements MapChunkCache {
         }
         public final int getHighestBlockYAt() {
             if(highest < 0) {
-                CuboidShortBuffer ss = getSnap(x, w.getHeight()-1, z);
+                ChunkSnapshot ss = getSnap(x, w.getHeight()-1, z);
+                short[] ids = ss.getBlockIds();
                 for(highest = w.getHeight(); highest > 0; highest--) {
-                    if(ss.getRawArray()[(bx<<8)|(bz<<4)|by] != 0)
+                    if(ids[(bx<<8)|(bz<<4)|by] != 0)
                         break;
                     if((highest & 0xF) == 0) {
                         ss = getSnap(x, highest-1, z);
+                        ids = ss.getBlockIds();
                     }
                 }
             }
@@ -125,31 +135,37 @@ public class SpoutMapChunkCache implements MapChunkCache {
             case 0:
                 x++;
                 bx++;
-                off++;
+                off+=256;
                 if(bx == 16) {  /* Next chunk? */
                     try {
                         bx = 0;
-                        off -= 16;
+                        off -= 16*256;
                         chunkindex++;
                         snap = snaparray[chunkindex];
                     } catch (ArrayIndexOutOfBoundsException aioobx) {
                         snap = EMPTY;
                         exceptions++;
                     }
+                    snapids = snap.getBlockIds();
+                    snapdata = snap.getBlockData();
                 }
                 break;
             case 1:
                 y++;
                 by++;
+                off++;
                 if(by == 16) {
                     try {
                         by = 0;
+                        off-=16;
                         chunkindex += xz_dim;
                         snap = snaparray[chunkindex];
                     } catch (ArrayIndexOutOfBoundsException aioobx) {
                         snap = EMPTY;
                         exceptions++;
                     }
+                    snapids = snap.getBlockIds();
+                    snapdata = snap.getBlockData();
                 }
                 break;
             case 2:
@@ -166,29 +182,35 @@ public class SpoutMapChunkCache implements MapChunkCache {
                         snap = EMPTY;
                         exceptions++;
                     }
+                    snapids = snap.getBlockIds();
+                    snapdata = snap.getBlockData();
                 }
                 break;
             case 3:
                 x--;
                 bx--;
-                off--;
+                off-=256;
                 if(bx == -1) {  /* Next chunk? */
                     try {
                         bx = 15;
-                        off += 16;
+                        off += 16*256;
                         chunkindex--;
                         snap = snaparray[chunkindex];
                     } catch (ArrayIndexOutOfBoundsException aioobx) {
                         snap = EMPTY;
                         exceptions++;
                     }
+                    snapids = snap.getBlockIds();
+                    snapdata = snap.getBlockData();
                 }
                 break;
             case 4:
                 y--;
                 by--;
+                off--;
                 if(by == -1) {
                     by = 15;
+                    off+=16;
                     chunkindex -= xz_dim;
                     try {
                         snap = snaparray[chunkindex];
@@ -196,6 +218,8 @@ public class SpoutMapChunkCache implements MapChunkCache {
                         snap = EMPTY;
                         exceptions++;
                     }
+                    snapids = snap.getBlockIds();
+                    snapdata = snap.getBlockData();
                 }
                 break;
             case 5:
@@ -212,6 +236,8 @@ public class SpoutMapChunkCache implements MapChunkCache {
                         snap = EMPTY;
                         exceptions++;
                     }
+                    snapids = snap.getBlockIds();
+                    snapdata = snap.getBlockData();
                 }
                 break;
             }
@@ -252,7 +278,7 @@ public class SpoutMapChunkCache implements MapChunkCache {
         public final int getBlockTypeIDAt(BlockStep s) {
             BlockStep ls = laststep;
             stepPosition(s);
-            int tid = snap.getRawArray()[(bx<<8)|(bz<<4)|by];
+            int tid = snapids[off];
             unstepPosition();
             laststep = ls;
             return tid;
@@ -265,6 +291,37 @@ public class SpoutMapChunkCache implements MapChunkCache {
             return 0;
         }
      }
+    private static class EmptySnapshot extends ChunkSnapshot {
+        private short[] zero = new short[16*16*16];
+        public EmptySnapshot(World world, float x, float y, float z) {
+            super(world, x, y, z);
+        }
+        public BlockMaterial getBlockMaterial(int x, int y, int z) {
+            return null;
+        }
+        public short getBlockId(int x, int y, int z) {
+            return 0;
+        }
+        public short getBlockData(int x, int y, int z) {
+            return 0;
+        }
+        @Override
+        public short[] getBlockIds() {
+            return zero;
+        }
+
+        @Override
+        public short[] getBlockData() {
+            return zero;
+        }
+        @Override
+        public Region getRegion() {
+            return null;
+        }
+        public Set<Entity> getEntities() {
+            return null;
+        }
+    }
     /**
      * Construct empty cache
      */
@@ -273,7 +330,7 @@ public class SpoutMapChunkCache implements MapChunkCache {
     public void setChunks(SpoutWorld dw, List<DynmapChunk> chunks) {
         w = dw.getWorld();
         this.chunks = chunks;
-        this.EMPTY = new CuboidShortBuffer(w,0,0,0,16,16,16);
+        this.EMPTY = new EmptySnapshot(w,0,0,0);
         this.y_min = 0;
         this.y_max = (w.getHeight() / 16)-1;
         /* Compute range */
@@ -301,7 +358,7 @@ public class SpoutMapChunkCache implements MapChunkCache {
         }
         xz_dim = x_dim * (z_max - z_min + 1);
     
-        snaparray = new CuboidShortBuffer[x_dim * (z_max-z_min+1) * (y_max-y_min+1)];
+        snaparray = new ChunkSnapshot[x_dim * (z_max-z_min+1) * (y_max-y_min+1)];
 
     }
     public int loadChunks(int max_to_load) {
@@ -336,9 +393,9 @@ public class SpoutMapChunkCache implements MapChunkCache {
             /* Loop through chunks in Y axis */
             for(int yy = 0; yy <= y_max; yy++) {
                 org.spout.api.geo.cuboid.Chunk c = w.getChunk(chunk.x, yy, chunk.z, false);
-                CuboidShortBuffer b = null;
+                ChunkSnapshot b = null;
                 if(c != null) {
-                    b = c.getBlockCuboidBufferLive();
+                    b = c.getSnapshot(false);
                 }
                 snaparray[(chunk.x-x_min) + (chunk.z - z_min)*x_dim + (yy*xz_dim)] = b;
             }
@@ -386,24 +443,25 @@ public class SpoutMapChunkCache implements MapChunkCache {
      * Get block ID at coordinates
      */
     public int getBlockTypeID(int x, int y, int z) {
-        CuboidShortBuffer ss = snaparray[((x>>4) - x_min) + ((z>>4) - z_min) * x_dim + ((y>>4) * xz_dim)];
-        return ss.getRawArray()[((x&0xF)<<8)|((z&0xF)<<4)|(y&0xF)];
+        ChunkSnapshot ss = snaparray[((x>>4) - x_min) + ((z>>4) - z_min) * x_dim + ((y>>4) * xz_dim)];
+        return ss.getBlockIds()[((x&0xF)<<8)|((z&0xF)<<4)|(y&0xF)];
     }
     /**
      * Get block data at coordiates
      */
     public byte getBlockData(int x, int y, int z) {
-        //TODO return (byte)w.getBlock(x, y, z).getBlockMaterial().getData();
-        return 0;
+        ChunkSnapshot ss = snaparray[((x>>4) - x_min) + ((z>>4) - z_min) * x_dim + ((y>>4) * xz_dim)];
+        return (byte)ss.getBlockData()[((x&0xF)<<8)|((z&0xF)<<4)|(y&0xF)];
     }
     /* Get highest block Y
      * 
      */
     public int getHighestBlockYAt(int x, int z) {
         int highest = w.getHeight();
-        CuboidShortBuffer ss = snaparray[((x>>4) - x_min) + ((z>>4) - z_min) * x_dim + (((highest-1)>>4) * xz_dim)];
+        ChunkSnapshot ss = snaparray[((x>>4) - x_min) + ((z>>4) - z_min) * x_dim + (((highest-1)>>4) * xz_dim)];
+        short[] ids = ss.getBlockIds();
         for(highest = w.getHeight(); highest > 0; highest--) {
-            if(ss.get(x&0xF, (highest-1) & 0xF, z & 0xF) != 0) {
+            if(ss.getBlockId(x, (highest-1), z) != 0) {
                 break;
             }
             if((highest & 0xF) == 0) {
