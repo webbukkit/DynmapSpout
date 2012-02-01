@@ -55,11 +55,11 @@ public class SpoutMapChunkCache implements MapChunkCache {
         private short[] snapids;
         private short[] snapdata;
         private BlockStep laststep;
-        private int typeid = -1;
-        private int highest = -1;
+        private int worldheight;
 
         OurMapIterator(int x0, int y0, int z0) {
             initialize(x0, y0, z0);
+            worldheight = w.getHeight();
         }
         public final void initialize(int x0, int y0, int z0) {
             this.x = x0;
@@ -74,8 +74,6 @@ public class SpoutMapChunkCache implements MapChunkCache {
             snapids = snap.getBlockIds();
             snapdata = snap.getBlockData();
             laststep = BlockStep.Y_MINUS;
-            highest = -1;
-            typeid = -1;
         }
         public final int getBlockTypeID() {
             return snapids[off];
@@ -91,21 +89,6 @@ public class SpoutMapChunkCache implements MapChunkCache {
                 exceptions++;
                 return EMPTY;
             }
-        }
-        public final int getHighestBlockYAt() {
-            if(highest < 0) {
-                ChunkSnapshot ss = getSnap(x, w.getHeight()-1, z);
-                short[] ids = ss.getBlockIds();
-                for(highest = w.getHeight(); highest > 0; highest--) {
-                    if(ids[(bx<<8)|(bz<<4)|by] != 0)
-                        break;
-                    if((highest & 0xF) == 0) {
-                        ss = getSnap(x, highest-1, z);
-                        ids = ss.getBlockIds();
-                    }
-                }
-            }
-            return highest;
         }
         public int getBlockSkyLight() {
             //TODO - no sky light API
@@ -242,7 +225,6 @@ public class SpoutMapChunkCache implements MapChunkCache {
                 break;
             }
             laststep = step;
-            typeid = -1;
         }
         /**
          * Unstep current position to previous position
@@ -264,7 +246,6 @@ public class SpoutMapChunkCache implements MapChunkCache {
             else
                 laststep = BlockStep.Y_MINUS;
             this.y = y;
-            typeid = -1;
         }
         public final int getX() {
             return x;
@@ -289,6 +270,9 @@ public class SpoutMapChunkCache implements MapChunkCache {
         public int countSmoothedSwampBiomes() {
             //TODO
             return 0;
+        }
+        public int getWorldHeight() {
+            return worldheight;
         }
      }
     private static class EmptySnapshot extends ChunkSnapshot {
@@ -452,23 +436,6 @@ public class SpoutMapChunkCache implements MapChunkCache {
     public byte getBlockData(int x, int y, int z) {
         ChunkSnapshot ss = snaparray[((x>>4) - x_min) + ((z>>4) - z_min) * x_dim + ((y>>4) * xz_dim)];
         return (byte)ss.getBlockData()[((x&0xF)<<8)|((z&0xF)<<4)|(y&0xF)];
-    }
-    /* Get highest block Y
-     * 
-     */
-    public int getHighestBlockYAt(int x, int z) {
-        int highest = w.getHeight();
-        ChunkSnapshot ss = snaparray[((x>>4) - x_min) + ((z>>4) - z_min) * x_dim + (((highest-1)>>4) * xz_dim)];
-        short[] ids = ss.getBlockIds();
-        for(highest = w.getHeight(); highest > 0; highest--) {
-            if(ss.getBlockId(x, (highest-1), z) != 0) {
-                break;
-            }
-            if((highest & 0xF) == 0) {
-                ss = snaparray[((x>>4) - x_min) + ((z>>4) - z_min) * x_dim + (((highest>>4) - 1) * xz_dim)];
-            }
-        }
-        return highest;
     }
     /* Get sky light level
      */
