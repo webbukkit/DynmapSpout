@@ -6,9 +6,9 @@ import java.util.List;
 
 import org.dynmap.Log;
 import org.spout.api.event.Event;
-import org.spout.api.event.EventException;
 import org.spout.api.event.EventExecutor;
 import org.spout.api.event.Order;
+import org.spout.api.exception.EventException;
 import org.spout.api.plugin.Plugin;
 
 public class SpoutEventProcessor {
