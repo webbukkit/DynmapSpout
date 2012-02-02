@@ -4,7 +4,6 @@ import java.io.File;
 import java.net.InetSocketAddress;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
@@ -13,9 +12,7 @@ import java.util.concurrent.FutureTask;
 import org.dynmap.DynmapCommonAPI;
 import org.dynmap.DynmapCore;
 import org.dynmap.DynmapLocation;
-import org.dynmap.DynmapWorld;
 import org.dynmap.Log;
-import org.dynmap.MapManager;
 import org.dynmap.common.BiomeMap;
 import org.dynmap.common.DynmapCommandSender;
 import org.dynmap.common.DynmapPlayer;
@@ -29,7 +26,6 @@ import org.spout.api.command.RawCommandExecutor;
 import org.spout.api.entity.Entity;
 import org.spout.api.event.Event;
 import org.spout.api.event.EventExecutor;
-import org.spout.api.event.Order;
 import org.spout.api.event.block.BlockChangeEvent;
 import org.spout.api.event.player.PlayerChatEvent;
 import org.spout.api.event.player.PlayerJoinEvent;
@@ -38,14 +34,13 @@ import org.spout.api.exception.CommandException;
 import org.spout.api.geo.World;
 import org.spout.api.geo.cuboid.Block;
 import org.spout.api.geo.discrete.Point;
-import org.spout.api.geo.discrete.atomic.Transform;
-import org.spout.api.material.block.BlockSnapshot;
 import org.spout.api.player.Player;
 import org.spout.api.plugin.CommonPlugin;
 import org.spout.api.plugin.PluginDescriptionFile;
 import org.spout.api.plugin.PluginManager;
 import org.spout.api.util.Named;
 import org.spout.api.Game;
+import org.spout.api.ChatColor;
 
 public class DynmapPlugin extends CommonPlugin implements DynmapCommonAPI {
     private final String prefix = "[Dynmap] ";
@@ -57,7 +52,6 @@ public class DynmapPlugin extends CommonPlugin implements DynmapCommonAPI {
     public SpoutEventProcessor sep;
 //TODO    public SnapshotCache sscache;
 
-    private MapManager mapManager;
     public static DynmapPlugin plugin;
 
     public DynmapPlugin() {
@@ -96,7 +90,7 @@ public class DynmapPlugin extends CommonPlugin implements DynmapCommonAPI {
 
         public Set<String> getIPBans() {
 //TODO          return getServer().getIPBans();
-            return Collections.EMPTY_SET;
+            return Collections.emptySet();
         }
 
         public <T> Future<T> callSyncMethod(final Callable<T> task) {
@@ -131,8 +125,7 @@ public class DynmapPlugin extends CommonPlugin implements DynmapCommonAPI {
         }
 
         public String stripChatColor(String s) {
-//TODO            return ChatColor.stripColor(s);
-            return s;
+            return ChatColor.strip(s);
         }
         
         private Set<EventType> registered = new HashSet<EventType>();
@@ -183,7 +176,6 @@ public class DynmapPlugin extends CommonPlugin implements DynmapCommonAPI {
                     sep.registerEvent(BlockChangeEvent.class, new EventExecutor() {
                         public void execute(Event evt) {
                             BlockChangeEvent bce = (BlockChangeEvent)evt;
-                            BlockSnapshot newstate = bce.getSnapshot();
                             Block b = bce.getBlock();
                             core.listenerManager.processBlockEvent(EventType.BLOCK_BREAK, b.getBlockId(),
                                     b.getWorld().getName(), b.getX(), b.getY(), b.getZ());
@@ -372,9 +364,6 @@ public class DynmapPlugin extends CommonPlugin implements DynmapCommonAPI {
             return;
         }
 //TODO        sscache = new SnapshotCache(core.getSnapShotCacheSize());
-
-        /* Get map manager from core */
-        mapManager = core.getMapManager();
         
         game.getScheduler().scheduleSyncDelayedTask(this, new Runnable() {
             public void run() {

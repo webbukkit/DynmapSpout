@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import org.dynmap.Log;
 import org.spout.api.event.Event;
 import org.spout.api.event.EventExecutor;
 import org.spout.api.event.Order;

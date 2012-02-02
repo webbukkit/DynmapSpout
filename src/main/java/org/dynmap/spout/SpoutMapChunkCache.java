@@ -18,7 +18,6 @@ import org.spout.api.geo.World;
 import org.spout.api.geo.cuboid.ChunkSnapshot;
 import org.spout.api.geo.cuboid.Region;
 import org.spout.api.material.BlockMaterial;
-import org.spout.api.util.cuboid.CuboidShortBuffer;
 
 /**
  * Container for managing chunks - dependent upon using chunk snapshots, since rendering is off server thread
