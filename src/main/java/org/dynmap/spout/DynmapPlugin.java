@@ -12,6 +12,7 @@ import java.util.concurrent.FutureTask;
 import org.dynmap.DynmapCommonAPI;
 import org.dynmap.DynmapCore;
 import org.dynmap.DynmapLocation;
+import org.dynmap.DynmapWorld;
 import org.dynmap.Log;
 import org.dynmap.common.BiomeMap;
 import org.dynmap.common.DynmapCommandSender;
@@ -229,6 +230,14 @@ public class DynmapPlugin extends CommonPlugin implements DynmapCommonAPI {
         }
         public void resetCacheStats() {
 //TODO            sscache.resetStats();
+        }
+
+        public DynmapWorld getWorldByName(String wname) {
+            World w = game.getWorld(wname);
+            if(w != null) {
+                return new SpoutWorld(w);
+            }
+            return null;
         }
     }
     /**
