@@ -856,4 +856,9 @@ public class DynmapPlugin extends CommonPlugin implements DynmapCommonAPI {
 //        bep.registerEvent(Event.Type.WORLD_UNLOAD, worldTrigger);
     }
 
+    public void assertPlayerInvisibility(String player, boolean is_invisible,
+            String plugin_id) {
+        core.assertPlayerInvisibility(player, is_invisible, plugin_id);
+    }
+
 }
