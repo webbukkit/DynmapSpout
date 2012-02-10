@@ -1,12 +1,14 @@
-# All paths in this configuration file are relative to Dynmap's data-folder: spout_server/plugins/dynmap/
+# All paths in this configuration file are relative to Dynmap's data-folder: minecraft_server/plugins/dynmap/
 
-# Set 'deftemplatesuffix' to select between default map definition templates:
-#    vlowres - uses the very-low-res map templates as world defaults (normal-vlowres, nether-vlowres and skylands-vlowres)
-#       The definitions of these templates are in normal-vlowres.txt, nether-vlowres.txt, and skylands-vlowres.txt
-#    lowres - uses the low-res map templates as world defaults (normal-lowres, nether-lowres and skylands-lowres), uncomment the following line
-#       The definitions of these templates are in normal-lowres.txt, nether-lowres.txt, and skylands-lowres.txt
-#    hires - uses the HDMap hi-res map templates (these can take a VERY long time for initial fullrender), comment the following line
-#       The definitions of these templates are in normal-hires.txt, nether-hires.txt, and skylands-hires.txt
+# All map templates are defined in the templates directory
+# The 'classic' FlatMap and KzedMap templates are used, which can be found in normal.txt, nether.txt, and skylands.txt
+#  To use these, do not set deftemplatesuffix (make sure deftemplatesuffix is commented, below)
+# To use the HDMap very-low-res map templates as world defaults (normal-vlowres, nether-vlowres and skylands-vlowres), set value to vlowres
+#   The definitions of these templates are in normal-vlowres.txt, nether-vlowres.txt, and skylands-vlowres.txt
+# To use the HDMap low-res map templates as world defaults (normal-lowres, nether-lowres and skylands-lowres), set value to lowres
+#   The definitions of these templates are in normal-lowres.txt, nether-lowres.txt, and skylands-lowres.txt
+# To use the HDMap hi-res map templates (these can take a VERY long time for initial fullrender), set value to hires
+#   The definitions of these templates are in normal-hires.txt, nether-hires.txt, and skylands-hires.txt
 deftemplatesuffix: vlowres
 
 components:
@@ -91,6 +93,8 @@ components:
     type: playermarkers
     showplayerfaces: true
     showplayerhealth: true
+    # If true, show player body too (only valid if showplayerfaces=true
+    showplayerbody: false
     # Option to make player faces small - don't use with showplayerhealth
     smallplayerfaces: false
     # Optional - make player faces layer hidden by default
@@ -114,6 +118,7 @@ components:
     type: coord
     label: "Location"
     hidey: false
+    show-mcr: false
     
   #- class: org.dynmap.ClientComponent
   #  type: logo
@@ -173,6 +178,9 @@ enabletilehash: true
 # Optional - enabled BetterGrass style rendering of grass and snow block sides
 #better-grass: true
 
+# Optional - enable smooth lighting by default on all maps supporting it (can be set per map as lighting option)
+smooth-lighting: false
+
 # Pre 0.29 render options - set all three to false if you want same results as 0.28 (i.e. you have existing maps and don't want to render)
 #  use-generated-textures: if true, use generated textures (same as client); false is static, pre 0.29 textures
 #  correct-water-lighting: if true, use corrected water lighting (same as client); false is legacy, pre 0.29 water (darker)
@@ -180,6 +188,8 @@ enabletilehash: true
 use-generated-textures: true
 correct-water-lighting: true
 correct-biome-shading: true
+# To enable smooth biome shading (as done in MC 1.1.0+), set this to true (this does increase render processing about 10%)
+smooth-biome-shading: true
 
 # Control loading of player faces (if set to false, skins are never fetched)
 #fetchskins: false
@@ -192,8 +202,11 @@ correct-biome-shading: true
 #   'newnorth' is used to rotate maps and rose (requires fullrender of any HDMap map - same as 'newrose' for FlatMap or KzedMap)
 compass-mode: newnorth
 
-# Enable Industrial Craft 2 block rendering support
+# Enable Industrial Craft 2 block rendering support (core, Advanced Machines, Charging Bench, Power Converters)
 #ic2-support: true
+#ic2-advancesmachines-support: true
+#ic2-chargingbench-support: true
+#ic2-powerconverters-support: true
 
 # Enable BuildCraft block rendering support
 #buildcraft-support: true
@@ -201,8 +214,16 @@ compass-mode: newnorth
 # Enable RedPower2 block rendering support
 #redpower2-support: true
 
+# Enable NetherOres block rendering support
+#netherores-support: true
+
+# Enable RailCraft block rendering support
+#railcraft-support: true
+
+# Enable Kaevator's Superslopes block rendering support
+#superslopes-support: true
+
 render-triggers:
-  #- chunkloaded
   #- playermove
   #- playerjoin
   - blockplaced
@@ -305,14 +326,6 @@ persist-ids-by-ip: true
 msg:
     maptypes: "Map Types"
     players: "Players"
-
-# NOTE: the 'templates' section is now found in the 'templates' directory
-#  Templates CAN still be defined in configuration.txt, as before 0.20
-templates:
-
-# NOTE: the 'worlds' section is now found in the worlds.txt (example custom settings can be found in worlds.txt.sample)
-#  Worlds CAN still be defined in configuration.txt, as before 0.20
-worlds:
 
 # Set to true to enable verbose startup messages - can help with debugging map configuration problems
 # Set to false for a much quieter startup log
