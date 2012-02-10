@@ -273,6 +273,9 @@ public class SpoutMapChunkCache implements MapChunkCache {
         public int getWorldHeight() {
             return worldheight;
         }
+        public long getBlockKey() {
+            return (((chunkindex * worldheight) + y) << 8) | (bx << 4) | bz;
+        }
      }
     private static class EmptySnapshot extends ChunkSnapshot {
         private short[] zero = new short[16*16*16];
