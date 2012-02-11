@@ -75,7 +75,8 @@ public class SpoutWorld extends DynmapWorld {
     /* Get light level of block */
     @Override
     public int getLightLevel(int x, int y, int z) {
-        return world.getBlockMaterial(x, y, z).getLightLevel();
+        //return world.getBlockMaterial(x, y, z).getLightLevel();
+        return 15;
     }
     /* Get highest Y coord of given location */
     @Override
@@ -90,13 +91,13 @@ public class SpoutWorld extends DynmapWorld {
     @Override
     public boolean canGetSkyLightLevel() {
 //TODO        return bll.isReady();
-        return false;
+        return true;
     }
     /* Return sky light level */
     @Override
     public int getSkyLightLevel(int x, int y, int z) {
 //TODO  return bll.getSkyLightLevel(world.getBlockAt(x, y, z));
-        return world.getBlockMaterial(x, y, z).getLightLevel();
+        return 15;
     }
     /**
      * Get world environment ID (lower case - normal, the_end, nether)

@@ -27,6 +27,8 @@ import org.spout.api.command.RawCommandExecutor;
 import org.spout.api.entity.Entity;
 import org.spout.api.event.Event;
 import org.spout.api.event.EventExecutor;
+import org.spout.api.event.EventHandler;
+import org.spout.api.event.Listener;
 import org.spout.api.event.block.BlockChangeEvent;
 import org.spout.api.event.player.PlayerChatEvent;
 import org.spout.api.event.player.PlayerJoinEvent;
@@ -35,6 +37,8 @@ import org.spout.api.exception.CommandException;
 import org.spout.api.geo.World;
 import org.spout.api.geo.cuboid.Block;
 import org.spout.api.geo.discrete.Point;
+import org.spout.api.geo.discrete.atomic.AtomicPoint;
+import org.spout.api.geo.discrete.atomic.Transform;
 import org.spout.api.player.Player;
 import org.spout.api.plugin.CommonPlugin;
 import org.spout.api.plugin.PluginDescriptionFile;
@@ -70,8 +74,9 @@ public class DynmapPlugin extends CommonPlugin implements DynmapCommonAPI {
         public DynmapPlayer[] getOnlinePlayers() {
             Player[] players = game.getOnlinePlayers();
             DynmapPlayer[] dplay = new DynmapPlayer[players.length];
-            for(int i = 0; i < players.length; i++)
+            for(int i = 0; i < players.length; i++) {
                 dplay[i] = new SpoutPlayer(players[i]);
+            }
             return dplay;
         }
 
@@ -744,32 +749,24 @@ public class DynmapPlugin extends CommonPlugin implements DynmapCommonAPI {
 //        bep.registerEvent(Event.Type.BLOCK_PISTON_EXTEND, blockTrigger);
 //        bep.registerEvent(Event.Type.BLOCK_PISTON_RETRACT, blockTrigger);
 //        /* Register player event trigger handlers */
-//        PlayerListener playerTrigger = new PlayerListener() {
-//            @Override
-//            public void onPlayerJoin(PlayerJoinEvent event) {
-//                if(onplayerjoin) {
-//                    Location loc = event.getPlayer().getLocation();
-//                    mapManager.touch(loc.getWorld().getName(), loc.getBlockX(), loc.getBlockY(), loc.getBlockZ(), "playerjoin");
-//                }
-//                core.listenerManager.processPlayerEvent(EventType.PLAYER_JOIN, new BukkitPlayer(event.getPlayer()));
-//            }
-//            @Override
-//            public void onPlayerQuit(PlayerQuitEvent event) {
-//                core.listenerManager.processPlayerEvent(EventType.PLAYER_QUIT, new BukkitPlayer(event.getPlayer()));
-//            }
-//
-//            @Override
-//            public void onPlayerMove(PlayerMoveEvent event) {
-//                Location loc = event.getPlayer().getLocation();
-//                mapManager.touch(loc.getWorld().getName(), loc.getBlockX(), loc.getBlockY(), loc.getBlockZ(), "playermove");
-//            }
-//        };
-//
-//        onplayerjoin = core.isTrigger("playerjoin");
-//        onplayermove = core.isTrigger("playermove");
-//        bep.registerEvent(Event.Type.PLAYER_JOIN, playerTrigger);
-//        bep.registerEvent(Event.Type.PLAYER_QUIT, playerTrigger);
-//        if(onplayermove)
+          Listener playerTrigger = new Listener() {
+              @EventHandler
+              void handlePlayerJoin(PlayerJoinEvent event) {
+                  if(onplayerjoin) {
+                      AtomicPoint loc = event.getPlayer().getEntity().getTransform().getPosition();
+                      core.mapManager.touch(loc.getWorld().getName(), (int)loc.getX(), (int)loc.getY(), (int)loc.getZ(), "playerjoin");
+                  }
+                  core.listenerManager.processPlayerEvent(EventType.PLAYER_JOIN, new SpoutPlayer(event.getPlayer()));
+              }
+              @EventHandler
+              void handlePlayerLeave(PlayerLeaveEvent event) {
+                  core.listenerManager.processPlayerEvent(EventType.PLAYER_QUIT, new SpoutPlayer(event.getPlayer()));
+              }
+          };
+          onplayerjoin = core.isTrigger("playerjoin");
+          onplayermove = core.isTrigger("playermove");
+          game.getEventManager().registerEvents(playerTrigger, plugin);
+//          if(onplayermove)
 //            bep.registerEvent(Event.Type.PLAYER_MOVE, playerTrigger);
 //
 //        /* Register entity event triggers */
