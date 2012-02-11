@@ -270,6 +270,10 @@ public class SpoutMapChunkCache implements MapChunkCache {
             //TODO
             return 0;
         }
+        public final int  countSmoothedSwampBiomes(int sx, int sz, int scale) {
+            //TODO
+            return 0;
+        }
         public int getWorldHeight() {
             return worldheight;
         }
