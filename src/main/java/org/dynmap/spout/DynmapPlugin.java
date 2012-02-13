@@ -873,4 +873,9 @@ public class DynmapPlugin extends CommonPlugin implements DynmapCommonAPI {
         core.assertPlayerInvisibility(player, is_invisible, plugin_id);
     }
 
+    public void assertPlayerVisibility(String player, boolean is_visible,
+            String plugin_id) {
+        core.assertPlayerVisibility(player, is_visible, plugin_id);
+    }
+
 }
