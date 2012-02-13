@@ -244,6 +244,11 @@ public class DynmapPlugin extends CommonPlugin implements DynmapCommonAPI {
             }
             return null;
         }
+
+        public DynmapPlayer getOfflinePlayer(String name) {
+            //TODO
+            return null;
+        }
     }
     /**
      * Player access abstraction class
@@ -310,6 +315,16 @@ public class DynmapPlugin extends CommonPlugin implements DynmapCommonAPI {
         public DynmapLocation getBedSpawnLocation() {
             //TODO
             return null;
+        }
+
+        public long getLastLoginTime() {
+            // TODO
+            return 0;
+        }
+
+        public long getFirstLoginTime() {
+            // TODO
+            return 0;
         }
     }
     /* Handler for generic console command sender */
