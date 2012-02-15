@@ -37,8 +37,6 @@ import org.spout.api.exception.CommandException;
 import org.spout.api.geo.World;
 import org.spout.api.geo.cuboid.Block;
 import org.spout.api.geo.discrete.Point;
-import org.spout.api.geo.discrete.atomic.AtomicPoint;
-import org.spout.api.geo.discrete.atomic.Transform;
 import org.spout.api.player.Player;
 import org.spout.api.plugin.CommonPlugin;
 import org.spout.api.plugin.PluginDescriptionFile;
@@ -278,7 +276,7 @@ public class DynmapPlugin extends CommonPlugin implements DynmapCommonAPI {
         }
 
         public DynmapLocation getLocation() {
-            Point p = player.getEntity().getTransform().getPosition();
+            Point p = player.getEntity().getPosition();
             return toLoc(p);
         }
 
@@ -768,7 +766,7 @@ public class DynmapPlugin extends CommonPlugin implements DynmapCommonAPI {
               @EventHandler
               void handlePlayerJoin(PlayerJoinEvent event) {
                   if(onplayerjoin) {
-                      AtomicPoint loc = event.getPlayer().getEntity().getTransform().getPosition();
+                      Point loc = event.getPlayer().getEntity().getPosition();
                       core.mapManager.touch(loc.getWorld().getName(), (int)loc.getX(), (int)loc.getY(), (int)loc.getZ(), "playerjoin");
                   }
                   core.listenerManager.processPlayerEvent(EventType.PLAYER_JOIN, new SpoutPlayer(event.getPlayer()));
