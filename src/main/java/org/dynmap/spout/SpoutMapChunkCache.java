@@ -280,6 +280,9 @@ public class SpoutMapChunkCache implements MapChunkCache {
         public long getBlockKey() {
             return (((chunkindex * worldheight) + y) << 8) | (bx << 4) | bz;
         }
+        public boolean isEmptySection() {
+            return (snap == EMPTY);
+        }
      }
     private static class EmptySnapshot extends ChunkSnapshot {
         private short[] zero = new short[16*16*16];
@@ -557,6 +560,10 @@ public class SpoutMapChunkCache implements MapChunkCache {
 
     public long getExceptionCount() {
         return exceptions;
+    }
+    public boolean isEmptySection(int x, int y, int z) {
+        ChunkSnapshot ss = snaparray[((x>>4) - x_min) + ((z>>4) - z_min) * x_dim + ((y>>4) * xz_dim)];
+        return (ss == EMPTY);
     }
 
 }

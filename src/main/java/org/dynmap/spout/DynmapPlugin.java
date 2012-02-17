@@ -25,6 +25,7 @@ import org.spout.api.command.Command;
 import org.spout.api.command.CommandSource;
 import org.spout.api.command.RawCommandExecutor;
 import org.spout.api.entity.Entity;
+import org.spout.api.entity.Position;
 import org.spout.api.event.Event;
 import org.spout.api.event.EventExecutor;
 import org.spout.api.event.EventHandler;
@@ -37,6 +38,7 @@ import org.spout.api.exception.CommandException;
 import org.spout.api.geo.World;
 import org.spout.api.geo.cuboid.Block;
 import org.spout.api.geo.discrete.Point;
+import org.spout.api.geo.discrete.Pointm;
 import org.spout.api.player.Player;
 import org.spout.api.plugin.CommonPlugin;
 import org.spout.api.plugin.PluginDescriptionFile;
@@ -276,7 +278,7 @@ public class DynmapPlugin extends CommonPlugin implements DynmapCommonAPI {
         }
 
         public DynmapLocation getLocation() {
-            Point p = player.getEntity().getPosition();
+            Point p = player.getEntity().getPoint();
             return toLoc(p);
         }
 
@@ -766,7 +768,7 @@ public class DynmapPlugin extends CommonPlugin implements DynmapCommonAPI {
               @EventHandler
               void handlePlayerJoin(PlayerJoinEvent event) {
                   if(onplayerjoin) {
-                      Point loc = event.getPlayer().getEntity().getPosition();
+                      Point loc = event.getPlayer().getEntity().getPoint();
                       core.mapManager.touch(loc.getWorld().getName(), (int)loc.getX(), (int)loc.getY(), (int)loc.getZ(), "playerjoin");
                   }
                   core.listenerManager.processPlayerEvent(EventType.PLAYER_JOIN, new SpoutPlayer(event.getPlayer()));
