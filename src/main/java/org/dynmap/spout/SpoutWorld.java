@@ -20,7 +20,7 @@ public class SpoutWorld extends DynmapWorld {
 //TODO    private static BlockLightLevel bll = new BlockLightLevel();
     
     public SpoutWorld(World w) {
-        super(w.getName(), w.getHeight());
+        super(w.getName(), w.getHeight(), 64);
         
         world = w;
         /* Hackish - but no generic way to spot nether */
