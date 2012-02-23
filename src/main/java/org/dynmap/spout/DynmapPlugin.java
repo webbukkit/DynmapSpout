@@ -877,5 +877,8 @@ public class DynmapPlugin extends CommonPlugin implements DynmapCommonAPI {
             String plugin_id) {
         core.assertPlayerVisibility(player, is_visible, plugin_id);
     }
+    public boolean setDisableChatToWebProcessing(boolean disable) {
+        return core.setDisableChatToWebProcessing(disable);
+    }
 
 }
