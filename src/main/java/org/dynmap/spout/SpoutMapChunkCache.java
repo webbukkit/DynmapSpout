@@ -1,6 +1,7 @@
 package org.dynmap.spout;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Set;
@@ -53,6 +54,8 @@ public class SpoutMapChunkCache implements MapChunkCache {
         private ChunkSnapshot snap;
         private short[] snapids;
         private short[] snapdata;
+        private short[] snapemit;
+        private short[] snapsky;
         private BlockStep laststep;
         private int worldheight;
 
@@ -72,6 +75,8 @@ public class SpoutMapChunkCache implements MapChunkCache {
             snap = getSnap(x, y, z);
             snapids = snap.getBlockIds();
             snapdata = snap.getBlockData();
+            snapemit = snap.getBlockLight();
+            snapsky = snap.getSkyLight();
             laststep = BlockStep.Y_MINUS;
         }
         public final int getBlockTypeID() {
@@ -90,12 +95,10 @@ public class SpoutMapChunkCache implements MapChunkCache {
             }
         }
         public int getBlockSkyLight() {
-            //TODO - no sky light API
-            return 15;
+            return snapsky[off];
         }
         public final int getBlockEmittedLight() {
-            //TODO - no emitted light API
-            return 0;
+            return snapemit[off];
         }
         public final BiomeMap getBiome() {
             //TODO
@@ -130,6 +133,8 @@ public class SpoutMapChunkCache implements MapChunkCache {
                     }
                     snapids = snap.getBlockIds();
                     snapdata = snap.getBlockData();
+                    snapemit = snap.getBlockLight();
+                    snapsky = snap.getSkyLight();
                 }
                 break;
             case 1:
@@ -148,6 +153,8 @@ public class SpoutMapChunkCache implements MapChunkCache {
                     }
                     snapids = snap.getBlockIds();
                     snapdata = snap.getBlockData();
+                    snapemit = snap.getBlockLight();
+                    snapsky = snap.getSkyLight();
                 }
                 break;
             case 2:
@@ -166,6 +173,8 @@ public class SpoutMapChunkCache implements MapChunkCache {
                     }
                     snapids = snap.getBlockIds();
                     snapdata = snap.getBlockData();
+                    snapemit = snap.getBlockLight();
+                    snapsky = snap.getSkyLight();
                 }
                 break;
             case 3:
@@ -184,6 +193,8 @@ public class SpoutMapChunkCache implements MapChunkCache {
                     }
                     snapids = snap.getBlockIds();
                     snapdata = snap.getBlockData();
+                    snapemit = snap.getBlockLight();
+                    snapsky = snap.getSkyLight();
                 }
                 break;
             case 4:
@@ -202,6 +213,8 @@ public class SpoutMapChunkCache implements MapChunkCache {
                     }
                     snapids = snap.getBlockIds();
                     snapdata = snap.getBlockData();
+                    snapemit = snap.getBlockLight();
+                    snapsky = snap.getSkyLight();
                 }
                 break;
             case 5:
@@ -220,6 +233,8 @@ public class SpoutMapChunkCache implements MapChunkCache {
                     }
                     snapids = snap.getBlockIds();
                     snapdata = snap.getBlockData();
+                    snapemit = snap.getBlockLight();
+                    snapsky = snap.getSkyLight();
                 }
                 break;
             }
@@ -284,8 +299,14 @@ public class SpoutMapChunkCache implements MapChunkCache {
             return (snap == EMPTY);
         }
      }
+    private static final short[] zero = new short[16*16*16];
+    private static final short[] fifteen = new short[16*16*16];
+
+    static {
+        Arrays.fill(fifteen, (short)15);
+    }
+    
     private static class EmptySnapshot extends ChunkSnapshot {
-        private short[] zero = new short[16*16*16];
         public EmptySnapshot(World world, float x, float y, float z) {
             super(world, x, y, z);
         }
@@ -313,6 +334,20 @@ public class SpoutMapChunkCache implements MapChunkCache {
         }
         public Set<Entity> getEntities() {
             return null;
+        }
+        public short getSkyLight(int x, int y, int z) {
+            return 15;
+        }
+        public short getBlockLight(int x, int y, int z) {
+            return 0;
+        }
+        @Override
+        public short[] getBlockLight() {
+            return zero;
+        }
+        @Override
+        public short[] getSkyLight() {
+            return fifteen;
         }
     }
     /**
