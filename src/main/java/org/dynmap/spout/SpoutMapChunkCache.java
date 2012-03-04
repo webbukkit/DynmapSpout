@@ -71,7 +71,7 @@ public class SpoutMapChunkCache implements MapChunkCache {
             this.by = y0 & 0xF;
             this.bz = z0 & 0xF;
             this.chunkindex = ((x >> 4) - x_min) + (((z >> 4) - z_min) * x_dim) + ((y >> 4) * xz_dim);
-            this.off = (bx<<8) + (bz << 4) + by;
+            this.off = (by<<8) + (bz << 4) + bx;
             snap = getSnap(x, y, z);
             snapids = snap.getBlockIds();
             snapdata = snap.getBlockData();
@@ -120,11 +120,11 @@ public class SpoutMapChunkCache implements MapChunkCache {
             case 0:
                 x++;
                 bx++;
-                off+=256;
+                off++;
                 if(bx == 16) {  /* Next chunk? */
                     try {
                         bx = 0;
-                        off -= 16*256;
+                        off -= 16;
                         chunkindex++;
                         snap = snaparray[chunkindex];
                     } catch (ArrayIndexOutOfBoundsException aioobx) {
@@ -140,11 +140,11 @@ public class SpoutMapChunkCache implements MapChunkCache {
             case 1:
                 y++;
                 by++;
-                off++;
+                off+=256;
                 if(by == 16) {
                     try {
                         by = 0;
-                        off-=16;
+                        off-=16*256;
                         chunkindex += xz_dim;
                         snap = snaparray[chunkindex];
                     } catch (ArrayIndexOutOfBoundsException aioobx) {
@@ -180,11 +180,11 @@ public class SpoutMapChunkCache implements MapChunkCache {
             case 3:
                 x--;
                 bx--;
-                off-=256;
+                off--;
                 if(bx == -1) {  /* Next chunk? */
                     try {
                         bx = 15;
-                        off += 16*256;
+                        off += 16;
                         chunkindex--;
                         snap = snaparray[chunkindex];
                     } catch (ArrayIndexOutOfBoundsException aioobx) {
@@ -200,10 +200,10 @@ public class SpoutMapChunkCache implements MapChunkCache {
             case 4:
                 y--;
                 by--;
-                off--;
+                off-=256;
                 if(by == -1) {
                     by = 15;
-                    off+=16;
+                    off+=16*256;
                     chunkindex -= xz_dim;
                     try {
                         snap = snaparray[chunkindex];
@@ -596,8 +596,8 @@ public class SpoutMapChunkCache implements MapChunkCache {
     public long getExceptionCount() {
         return exceptions;
     }
-    public boolean isEmptySection(int x, int y, int z) {
-        ChunkSnapshot ss = snaparray[((x>>4) - x_min) + ((z>>4) - z_min) * x_dim + ((y>>4) * xz_dim)];
+    public boolean isEmptySection(int sx, int sy, int sz) {
+        ChunkSnapshot ss = snaparray[(sx - x_min) + (sz - z_min) * x_dim + (sy * xz_dim)];
         return (ss == EMPTY);
     }
 
