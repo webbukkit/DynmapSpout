@@ -25,11 +25,11 @@ import org.spout.api.command.Command;
 import org.spout.api.command.CommandSource;
 import org.spout.api.command.RawCommandExecutor;
 import org.spout.api.entity.Entity;
-import org.spout.api.entity.Position;
 import org.spout.api.event.Event;
 import org.spout.api.event.EventExecutor;
 import org.spout.api.event.EventHandler;
 import org.spout.api.event.Listener;
+import org.spout.api.event.Order;
 import org.spout.api.event.block.BlockChangeEvent;
 import org.spout.api.event.player.PlayerChatEvent;
 import org.spout.api.event.player.PlayerJoinEvent;
@@ -38,7 +38,6 @@ import org.spout.api.exception.CommandException;
 import org.spout.api.geo.World;
 import org.spout.api.geo.cuboid.Block;
 import org.spout.api.geo.discrete.Point;
-import org.spout.api.geo.discrete.Pointm;
 import org.spout.api.player.Player;
 import org.spout.api.plugin.CommonPlugin;
 import org.spout.api.plugin.PluginDescriptionFile;
@@ -167,15 +166,17 @@ public class DynmapPlugin extends CommonPlugin implements DynmapCommonAPI {
 //TODO                    });
                     break;
                 case PLAYER_CHAT:
-                    sep.registerEvent(PlayerChatEvent.class, new EventExecutor() {
-                        public void execute(Event evt) {
-                            PlayerChatEvent chatevt = (PlayerChatEvent)evt;
+                    Listener chatListener = new Listener() {
+                        @SuppressWarnings("unused")
+                        @EventHandler(order=Order.MONITOR)
+                        public void handleChatEvent(PlayerChatEvent event) {
                             DynmapPlayer p = null;
-                            if(chatevt.getPlayer() != null)
-                                p = new SpoutPlayer(chatevt.getPlayer());
-                            core.listenerManager.processChatEvent(EventType.PLAYER_CHAT, p, chatevt.getMessage());
+                            if(event.getPlayer() != null)
+                                p = new SpoutPlayer(event.getPlayer());
+                            core.listenerManager.processChatEvent(EventType.PLAYER_CHAT, p, event.getMessage());
                         }
-                    });
+                    };
+                    game.getEventManager().registerEvents(chatListener, plugin);
                     break;
                 case BLOCK_BREAK:
                     //TODO - doing this for all block changes, not just breaks
@@ -546,21 +547,8 @@ public class DynmapPlugin extends CommonPlugin implements DynmapCommonAPI {
         });
     }
 
-    private boolean onplace;
-    private boolean onbreak;
-    private boolean onblockform;
-    private boolean onblockfade;
-    private boolean onblockspread;
-    private boolean onblockfromto;
-    private boolean onblockphysics;
-    private boolean onleaves;
-    private boolean onburn;
-    private boolean onpiston;
+    private boolean onblockchange;
     private boolean onplayerjoin;
-    private boolean onplayermove;
-    private boolean ongeneratechunk;
-    private boolean onloadchunk;
-    private boolean onexplosion;
 
     private void registerEvents() {
 //        BlockListener blockTrigger = new BlockListener() {
@@ -763,24 +751,40 @@ public class DynmapPlugin extends CommonPlugin implements DynmapCommonAPI {
 //        onpiston = core.isTrigger("pistonmoved");
 //        bep.registerEvent(Event.Type.BLOCK_PISTON_EXTEND, blockTrigger);
 //        bep.registerEvent(Event.Type.BLOCK_PISTON_RETRACT, blockTrigger);
-//        /* Register player event trigger handlers */
-          Listener playerTrigger = new Listener() {
-              @EventHandler
-              void handlePlayerJoin(PlayerJoinEvent event) {
-                  if(onplayerjoin) {
-                      Point loc = event.getPlayer().getEntity().getPoint();
-                      core.mapManager.touch(loc.getWorld().getName(), (int)loc.getX(), (int)loc.getY(), (int)loc.getZ(), "playerjoin");
-                  }
-                  core.listenerManager.processPlayerEvent(EventType.PLAYER_JOIN, new SpoutPlayer(event.getPlayer()));
-              }
-              @EventHandler
-              void handlePlayerLeave(PlayerLeaveEvent event) {
-                  core.listenerManager.processPlayerEvent(EventType.PLAYER_QUIT, new SpoutPlayer(event.getPlayer()));
-              }
-          };
-          onplayerjoin = core.isTrigger("playerjoin");
-          onplayermove = core.isTrigger("playermove");
-          game.getEventManager().registerEvents(playerTrigger, plugin);
+        /* Register block change trigger */
+        Listener blockTrigger = new Listener() {
+            @SuppressWarnings("unused")
+            @EventHandler(order=Order.MONITOR)
+            void handleBlockChange(BlockChangeEvent event) {
+                if(event.isCancelled())
+                    return;
+                Point p = event.getBlock().getBase();
+                core.mapManager.touch(p.getWorld().getName(), (int)p.getX(), (int)p.getY(), (int)p.getZ(), "blockchange");
+            }
+        };
+        onblockchange = core.isTrigger("blockchange");
+        if(onblockchange)
+            game.getEventManager().registerEvents(blockTrigger, plugin);
+
+        /* Register player event trigger handlers */
+        Listener playerTrigger = new Listener() {
+            @SuppressWarnings("unused")
+            @EventHandler
+            void handlePlayerJoin(PlayerJoinEvent event) {
+                if(onplayerjoin) {
+                    Point loc = event.getPlayer().getEntity().getPoint();
+                    core.mapManager.touch(loc.getWorld().getName(), (int)loc.getX(), (int)loc.getY(), (int)loc.getZ(), "playerjoin");
+                }
+                core.listenerManager.processPlayerEvent(EventType.PLAYER_JOIN, new SpoutPlayer(event.getPlayer()));
+            }
+            @SuppressWarnings("unused")
+            @EventHandler
+            void handlePlayerLeave(PlayerLeaveEvent event) {
+                core.listenerManager.processPlayerEvent(EventType.PLAYER_QUIT, new SpoutPlayer(event.getPlayer()));
+            }
+        };
+        onplayerjoin = core.isTrigger("playerjoin");
+        game.getEventManager().registerEvents(playerTrigger, plugin);
 //          if(onplayermove)
 //            bep.registerEvent(Event.Type.PLAYER_MOVE, playerTrigger);
 //
