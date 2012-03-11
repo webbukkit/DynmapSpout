@@ -281,14 +281,6 @@ public class SpoutMapChunkCache implements MapChunkCache {
         public BlockStep getLastStep() {
             return laststep;
         }
-        public int countSmoothedSwampBiomes() {
-            //TODO
-            return 0;
-        }
-        public final int  countSmoothedSwampBiomes(int sx, int sz, int scale) {
-            //TODO
-            return 0;
-        }
         public int getWorldHeight() {
             return worldheight;
         }
@@ -297,6 +289,21 @@ public class SpoutMapChunkCache implements MapChunkCache {
         }
         public boolean isEmptySection() {
             return (snap == EMPTY);
+        }
+        public int getSmoothGrassColorMultiplier(int[] colormap, int width) {
+            // TODO
+            BiomeMap bm = getBiome();
+            return colormap[bm.biomeLookup(width)];
+        }
+        public int getSmoothFoliageColorMultiplier(int[] colormap, int width) {
+            // TODO Auto-generated method stub
+            BiomeMap bm = getBiome();
+            return colormap[bm.biomeLookup(width)];
+        }
+        public int getSmoothWaterColorMultiplier() {
+            // TODO Auto-generated method stub
+            BiomeMap bm = getBiome();
+            return bm.getWaterColorMult();
         }
      }
     private static final short[] zero = new short[16*16*16];
