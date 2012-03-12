@@ -54,8 +54,8 @@ public class SpoutMapChunkCache implements MapChunkCache {
         private ChunkSnapshot snap;
         private short[] snapids;
         private short[] snapdata;
-        private short[] snapemit;
-        private short[] snapsky;
+        private byte[] snapemit;
+        private byte[] snapsky;
         private BlockStep laststep;
         private int worldheight;
 
@@ -307,10 +307,11 @@ public class SpoutMapChunkCache implements MapChunkCache {
         }
      }
     private static final short[] zero = new short[16*16*16];
-    private static final short[] fifteen = new short[16*16*16];
+    private static final byte[] zerobyte = new byte[16*16*16];
+    private static final byte[] fifteen = new byte[16*16*16];
 
     static {
-        Arrays.fill(fifteen, (short)15);
+        Arrays.fill(fifteen, (byte)15);
     }
     
     private static class EmptySnapshot extends ChunkSnapshot {
@@ -342,18 +343,18 @@ public class SpoutMapChunkCache implements MapChunkCache {
         public Set<Entity> getEntities() {
             return null;
         }
-        public short getSkyLight(int x, int y, int z) {
+        public byte getSkyLight(int x, int y, int z) {
             return 15;
         }
-        public short getBlockLight(int x, int y, int z) {
+        public byte getBlockLight(int x, int y, int z) {
             return 0;
         }
         @Override
-        public short[] getBlockLight() {
-            return zero;
+        public byte[] getBlockLight() {
+            return zerobyte;
         }
         @Override
-        public short[] getSkyLight() {
+        public byte[] getSkyLight() {
             return fifteen;
         }
     }

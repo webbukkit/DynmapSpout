@@ -279,7 +279,7 @@ public class DynmapPlugin extends CommonPlugin implements DynmapCommonAPI {
         }
 
         public DynmapLocation getLocation() {
-            Point p = player.getEntity().getPoint();
+            Point p = player.getEntity().getPosition();
             return toLoc(p);
         }
 
@@ -772,7 +772,7 @@ public class DynmapPlugin extends CommonPlugin implements DynmapCommonAPI {
             @EventHandler
             void handlePlayerJoin(PlayerJoinEvent event) {
                 if(onplayerjoin) {
-                    Point loc = event.getPlayer().getEntity().getPoint();
+                    Point loc = event.getPlayer().getEntity().getPosition();
                     core.mapManager.touch(loc.getWorld().getName(), (int)loc.getX(), (int)loc.getY(), (int)loc.getZ(), "playerjoin");
                 }
                 core.listenerManager.processPlayerEvent(EventType.PLAYER_JOIN, new SpoutPlayer(event.getPlayer()));
