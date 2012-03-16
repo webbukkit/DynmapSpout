@@ -10,8 +10,8 @@ import org.dynmap.DynmapWorld;
 import org.dynmap.Log;
 import org.dynmap.utils.MapChunkCache;
 import org.spout.api.geo.World;
-import org.spout.api.geo.discrete.Pointm;
-import org.spout.api.geo.discrete.atomic.Transform;
+import org.spout.api.geo.discrete.Point;
+import org.spout.api.geo.discrete.Transform;
 
 public class SpoutWorld extends DynmapWorld {
     private World world;
@@ -44,7 +44,7 @@ public class SpoutWorld extends DynmapWorld {
         DynmapLocation dloc = new DynmapLocation(getName(), 0, 64, 0);
         Transform t = world.getSpawnPoint();
         if(t != null) {
-            Pointm p = t.getPosition();
+            Point p = t.getPosition();
             dloc.x = p.getX(); dloc.y = p.getY();
             dloc.z = p.getZ(); dloc.world = getName();
         }
