@@ -293,17 +293,22 @@ public class SpoutMapChunkCache implements MapChunkCache {
         public int getSmoothGrassColorMultiplier(int[] colormap, int width) {
             // TODO
             BiomeMap bm = getBiome();
-            return colormap[bm.biomeLookup(width)];
+            return bm.getModifiedGrassMultiplier(colormap[bm.biomeLookup(width)]);
         }
         public int getSmoothFoliageColorMultiplier(int[] colormap, int width) {
             // TODO Auto-generated method stub
             BiomeMap bm = getBiome();
-            return colormap[bm.biomeLookup(width)];
+            return bm.getModifiedFoliageMultiplier(colormap[bm.biomeLookup(width)]);
         }
         public int getSmoothWaterColorMultiplier() {
             // TODO Auto-generated method stub
             BiomeMap bm = getBiome();
             return bm.getWaterColorMult();
+        }
+        public int getSmoothWaterColorMultiplier(int[] colormap, int width) {
+            // TODO Auto-generated method stub
+            BiomeMap bm = getBiome();
+            return colormap[bm.biomeLookup(width)];
         }
      }
     private static final short[] zero = new short[16*16*16];
