@@ -300,6 +300,14 @@ public class SpoutMapChunkCache implements MapChunkCache {
             BiomeMap bm = getBiome();
             return bm.getModifiedFoliageMultiplier(colormap[bm.biomeLookup(width)]);
         }
+        public int getSmoothColorMultiplier(int[] colormap, int width, int[] swampmap, int swampwidth) {
+            // TODO Auto-generated method stub
+            BiomeMap bm = getBiome();
+            if(bm == BiomeMap.SWAMPLAND)
+                return swampmap[bm.biomeLookup(swampwidth)];
+            else
+                return colormap[bm.biomeLookup(width)];
+        }
         public int getSmoothWaterColorMultiplier() {
             // TODO Auto-generated method stub
             BiomeMap bm = getBiome();
