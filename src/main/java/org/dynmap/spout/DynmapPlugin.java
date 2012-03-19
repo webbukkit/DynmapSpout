@@ -413,7 +413,7 @@ public class DynmapPlugin extends CommonPlugin implements DynmapCommonAPI {
             public String getName() { return "dynmap"; }
         }, "dynmap");
         cmd.setRawExecutor(new RawCommandExecutor() {
-            public void execute(CommandSource sender, String[] args,
+            public void execute(Command command, CommandSource sender, String[] args,
                     int baseIndex, boolean fuzzyLookup) throws CommandException {
                 DynmapCommandSender dsender;
                 if(sender instanceof Player) {
@@ -426,8 +426,8 @@ public class DynmapPlugin extends CommonPlugin implements DynmapCommonAPI {
                 System.arraycopy(args, 1, cmdargs, 0, cmdargs.length);
                 if(!core.processCommand(dsender, args[0], "dynmap", cmdargs))
                     throw new CommandException("Bad Command");
-                
-            } });
+            }
+        });
     }
     
     @Override
