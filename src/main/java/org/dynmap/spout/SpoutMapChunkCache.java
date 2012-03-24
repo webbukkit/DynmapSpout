@@ -334,9 +334,6 @@ public class SpoutMapChunkCache implements MapChunkCache {
         public BlockMaterial getBlockMaterial(int x, int y, int z) {
             return null;
         }
-        public short getBlockId(int x, int y, int z) {
-            return 0;
-        }
         public short getBlockData(int x, int y, int z) {
             return 0;
         }

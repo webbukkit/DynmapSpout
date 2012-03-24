@@ -7,11 +7,11 @@ import java.util.List;
 import org.dynmap.DynmapChunk;
 import org.dynmap.DynmapLocation;
 import org.dynmap.DynmapWorld;
-import org.dynmap.Log;
 import org.dynmap.utils.MapChunkCache;
 import org.spout.api.geo.World;
 import org.spout.api.geo.discrete.Point;
 import org.spout.api.geo.discrete.Transform;
+import org.spout.api.material.BlockMaterial;
 
 public class SpoutWorld extends DynmapWorld {
     private World world;
@@ -82,7 +82,7 @@ public class SpoutWorld extends DynmapWorld {
     @Override
     public int getHighestBlockYAt(int x, int z) {
         for(int y = (world.getHeight()-1); y >= 0; y--) {
-            if(world.getBlockId(x, y, z) != 0)
+            if(world.getBlockMaterial(x, y, z) != BlockMaterial.AIR)
                 return y+1;
         }
         return 0;

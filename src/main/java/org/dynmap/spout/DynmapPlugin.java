@@ -184,7 +184,7 @@ public class DynmapPlugin extends CommonPlugin implements DynmapCommonAPI {
                         public void execute(Event evt) {
                             BlockChangeEvent bce = (BlockChangeEvent)evt;
                             Block b = bce.getBlock();
-                            core.listenerManager.processBlockEvent(EventType.BLOCK_BREAK, b.getBlockId(),
+                            core.listenerManager.processBlockEvent(EventType.BLOCK_BREAK, b.getMaterial().getId(),
                                     b.getWorld().getName(), b.getX(), b.getY(), b.getZ());
                         }
                     });
@@ -758,7 +758,7 @@ public class DynmapPlugin extends CommonPlugin implements DynmapCommonAPI {
             void handleBlockChange(BlockChangeEvent event) {
                 if(event.isCancelled())
                     return;
-                Point p = event.getBlock().getBase();
+                Point p = event.getBlock().getPosition();
                 core.mapManager.touch(p.getWorld().getName(), (int)p.getX(), (int)p.getY(), (int)p.getZ(), "blockchange");
             }
         };
