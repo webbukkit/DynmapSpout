@@ -45,6 +45,7 @@ import org.spout.api.plugin.PluginManager;
 import org.spout.api.util.Named;
 import org.spout.api.Game;
 import org.spout.api.ChatColor;
+import org.spout.api.Spout;
 
 public class DynmapPlugin extends CommonPlugin implements DynmapCommonAPI {
     private final String prefix = "[Dynmap] ";
@@ -249,6 +250,20 @@ public class DynmapPlugin extends CommonPlugin implements DynmapCommonAPI {
         public DynmapPlayer getOfflinePlayer(String name) {
             //TODO
             return null;
+        }
+
+        public Set<String> checkPlayerPermissions(String player,
+                Set<String> perms) {
+            Set<String> hasperms = null;
+            Player p = Spout.getGame().getPlayer(player, true);
+            if(p != null) {
+                hasperms = new HashSet<String>();
+                for (String pp : perms) {
+                    if(p.hasPermission(pp))
+                        perms.add(pp);
+                }
+            }
+            return hasperms;
         }
     }
     /**
