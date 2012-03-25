@@ -248,7 +248,10 @@ public class DynmapPlugin extends CommonPlugin implements DynmapCommonAPI {
         }
 
         public DynmapPlayer getOfflinePlayer(String name) {
-            //TODO
+            Player p = Spout.getGame().getPlayer(name, true);
+            if(p != null) {
+                return new SpoutPlayer(p);
+            }
             return null;
         }
 
@@ -259,11 +262,19 @@ public class DynmapPlugin extends CommonPlugin implements DynmapCommonAPI {
             if(p != null) {
                 hasperms = new HashSet<String>();
                 for (String pp : perms) {
-                    if(p.hasPermission(pp))
+                    if(p.hasPermission("dynmap." + pp))
                         perms.add(pp);
                 }
             }
             return hasperms;
+        }
+
+        public boolean checkPlayerPermission(String player, String perm) {
+            Player p = Spout.getGame().getPlayer(player, true);
+            if(p != null) {
+                return p.hasPermission("dynmap." + perm);
+            }
+            return false;
         }
     }
     /**
@@ -319,8 +330,11 @@ public class DynmapPlugin extends CommonPlugin implements DynmapCommonAPI {
         }
 
         public int getHealth() {
-            //TODO
-            return 0;
+            Entity e = player.getEntity();
+            if(e != null) 
+                return e.getHealth();
+            else
+                return 0;
         }
 
         public int getArmorPoints() {
