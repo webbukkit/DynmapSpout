@@ -95,10 +95,12 @@ public class SpoutMapChunkCache implements MapChunkCache {
             }
         }
         public int getBlockSkyLight() {
-            return snapsky[off];
+            int light = snapsky[off >> 1];
+            return 0x0F & (light >> (4 - (4 * (off & 1))));
         }
         public final int getBlockEmittedLight() {
-            return snapemit[off];
+            int light = snapemit[off >> 1];
+            return 0x0F & (light >> (4 - (4 * (off & 1))));
         }
         public final BiomeMap getBiome() {
             //TODO
@@ -320,11 +322,11 @@ public class SpoutMapChunkCache implements MapChunkCache {
         }
      }
     private static final short[] zero = new short[16*16*16];
-    private static final byte[] zerobyte = new byte[16*16*16];
-    private static final byte[] fifteen = new byte[16*16*16];
+    private static final byte[] zerobyte = new byte[16*16*16/2];
+    private static final byte[] ffbyte = new byte[16*16*16/2];
 
     static {
-        Arrays.fill(fifteen, (byte)15);
+        Arrays.fill(ffbyte, (byte)0xff);
     }
     
     private static class EmptySnapshot extends ChunkSnapshot {
@@ -365,7 +367,7 @@ public class SpoutMapChunkCache implements MapChunkCache {
         }
         @Override
         public byte[] getSkyLight() {
-            return fifteen;
+            return ffbyte;
         }
     }
     /**
