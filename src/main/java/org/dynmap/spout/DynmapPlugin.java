@@ -43,8 +43,8 @@ import org.spout.api.plugin.CommonPlugin;
 import org.spout.api.plugin.PluginDescriptionFile;
 import org.spout.api.plugin.PluginManager;
 import org.spout.api.util.Named;
-import org.spout.api.Game;
 import org.spout.api.ChatColor;
+import org.spout.api.Server;
 import org.spout.api.Spout;
 
 public class DynmapPlugin extends CommonPlugin implements DynmapCommonAPI {
@@ -53,14 +53,15 @@ public class DynmapPlugin extends CommonPlugin implements DynmapCommonAPI {
     private DynmapCore core;
     private PermissionProvider permissions;
     private String version;
-    private Game game;
     public SpoutEventProcessor sep;
+    public Server server;
 //TODO    public SnapshotCache sscache;
 
     public static DynmapPlugin plugin;
 
     public DynmapPlugin() {
         plugin = this;
+        server = (Server) Spout.getEngine();
     }
     
     /**
@@ -68,11 +69,11 @@ public class DynmapPlugin extends CommonPlugin implements DynmapCommonAPI {
      */
     public class SpoutServer implements DynmapServerInterface {
         public void scheduleServerTask(Runnable run, long delay) {
-            game.getScheduler().scheduleSyncDelayedTask(DynmapPlugin.this, run, delay);
+            Spout.getScheduler().scheduleSyncDelayedTask(DynmapPlugin.this, run, delay);
         }
         
         public DynmapPlayer[] getOnlinePlayers() {
-            Player[] players = game.getOnlinePlayers();
+            Player[] players = server.getOnlinePlayers();
             DynmapPlayer[] dplay = new DynmapPlayer[players.length];
             for(int i = 0; i < players.length; i++) {
                 dplay[i] = new SpoutPlayer(players[i]);
@@ -81,13 +82,13 @@ public class DynmapPlugin extends CommonPlugin implements DynmapCommonAPI {
         }
 
         public void reload() {
-            PluginManager pluginManager = game.getPluginManager();
+            PluginManager pluginManager = server.getPluginManager();
             pluginManager.disablePlugin(DynmapPlugin.this);
             pluginManager.enablePlugin(DynmapPlugin.this);
         }
 
         public DynmapPlayer getPlayer(String name) {
-            Player p = game.getPlayer(name, true);
+            Player p = server.getPlayer(name, true);
             if(p != null) {
                 return new SpoutPlayer(p);
             }
@@ -103,7 +104,7 @@ public class DynmapPlugin extends CommonPlugin implements DynmapCommonAPI {
             final FutureTask<T> ft = new FutureTask<T>(task);
             final Object o = new Object();
             synchronized(o) {
-                game.getScheduler().scheduleSyncDelayedTask(DynmapPlugin.this, new Runnable() {
+                server.getScheduler().scheduleSyncDelayedTask(DynmapPlugin.this, new Runnable() {
                     public void run() {
                         try {
                             ft.run();
@@ -120,7 +121,7 @@ public class DynmapPlugin extends CommonPlugin implements DynmapCommonAPI {
         }
 
         public String getServerName() {
-            return game.getName();
+            return server.getName();
         }
 
         public boolean isPlayerBanned(String pid) {
@@ -177,7 +178,7 @@ public class DynmapPlugin extends CommonPlugin implements DynmapCommonAPI {
                             core.listenerManager.processChatEvent(EventType.PLAYER_CHAT, p, event.getMessage());
                         }
                     };
-                    game.getEventManager().registerEvents(chatListener, plugin);
+                    server.getEventManager().registerEvents(chatListener, plugin);
                     break;
                 case BLOCK_BREAK:
                     //TODO - doing this for all block changes, not just breaks
@@ -215,12 +216,12 @@ public class DynmapPlugin extends CommonPlugin implements DynmapCommonAPI {
         
         public boolean sendWebChatEvent(String source, String name, String msg) {
             DynmapWebChatEvent evt = new DynmapWebChatEvent(source, name, msg);
-            game.getEventManager().callEvent(evt);
+            server.getEventManager().callEvent(evt);
             return (evt.isCancelled() == false);
         }
         
         public void broadcastMessage(String msg) {
-            game.broadcastMessage(msg);
+            server.broadcastMessage(msg);
         }
 
         public String[] getBiomeIDs() {
@@ -240,7 +241,7 @@ public class DynmapPlugin extends CommonPlugin implements DynmapCommonAPI {
         }
 
         public DynmapWorld getWorldByName(String wname) {
-            World w = game.getWorld(wname);
+            World w = server.getWorld(wname);
             if(w != null) {
                 return new SpoutWorld(w);
             }
@@ -248,7 +249,7 @@ public class DynmapPlugin extends CommonPlugin implements DynmapCommonAPI {
         }
 
         public DynmapPlayer getOfflinePlayer(String name) {
-            Player p = Spout.getGame().getPlayer(name, true);
+            Player p = server.getPlayer(name, true);
             if(p != null) {
                 return new SpoutPlayer(p);
             }
@@ -258,7 +259,7 @@ public class DynmapPlugin extends CommonPlugin implements DynmapCommonAPI {
         public Set<String> checkPlayerPermissions(String player,
                 Set<String> perms) {
             Set<String> hasperms = null;
-            Player p = Spout.getGame().getPlayer(player, true);
+            Player p = server.getPlayer(player, true);
             if(p != null) {
                 hasperms = new HashSet<String>();
                 for (String pp : perms) {
@@ -270,7 +271,7 @@ public class DynmapPlugin extends CommonPlugin implements DynmapCommonAPI {
         }
 
         public boolean checkPlayerPermission(String player, String perm) {
-            Player p = Spout.getGame().getPlayer(player, true);
+            Player p = server.getPlayer(player, true);
             if(p != null) {
                 return p.hasPermission("dynmap." + perm);
             }
@@ -386,8 +387,6 @@ public class DynmapPlugin extends CommonPlugin implements DynmapCommonAPI {
     @Override
     public void onEnable() {
         
-        game = getGame();
-        
         PluginDescriptionFile pdfFile = this.getDescription();
         version = pdfFile.getVersion();
 
@@ -406,7 +405,7 @@ public class DynmapPlugin extends CommonPlugin implements DynmapCommonAPI {
         if(dataDirectory.exists() == false)
             dataDirectory.mkdirs();
         /* Get MC version */
-        String mcver = game.getVersion();
+        String mcver = server.getVersion();
         
         /* Instantiate core */
         if(core == null)
@@ -424,10 +423,10 @@ public class DynmapPlugin extends CommonPlugin implements DynmapCommonAPI {
         }
 //TODO        sscache = new SnapshotCache(core.getSnapShotCacheSize());
         
-        game.getScheduler().scheduleSyncDelayedTask(this, new Runnable() {
+        server.getScheduler().scheduleSyncDelayedTask(this, new Runnable() {
             public void run() {
                 /* Initialized the currently loaded worlds */
-                for (World world : game.getWorlds()) {
+                for (World world : server.getWorlds()) {
                     SpoutWorld w = new SpoutWorld(world);
                     if(core.processWorldLoad(w))    /* Have core process load first - fire event listeners if good load after */
                         core.listenerManager.processWorldEvent(EventType.WORLD_LOAD, w);
@@ -438,7 +437,7 @@ public class DynmapPlugin extends CommonPlugin implements DynmapCommonAPI {
         /* Register our update trigger events */
         registerEvents();
         
-        Command cmd = game.getRootCommand().addSubCommand(new Named() {
+        Command cmd = server.getRootCommand().addSubCommand(new Named() {
             public String getName() { return "dynmap"; }
         }, "dynmap");
         cmd.setRawExecutor(new RawCommandExecutor() {
@@ -793,7 +792,7 @@ public class DynmapPlugin extends CommonPlugin implements DynmapCommonAPI {
         };
         onblockchange = core.isTrigger("blockchange");
         if(onblockchange)
-            game.getEventManager().registerEvents(blockTrigger, plugin);
+            server.getEventManager().registerEvents(blockTrigger, plugin);
 
         /* Register player event trigger handlers */
         Listener playerTrigger = new Listener() {
@@ -813,7 +812,7 @@ public class DynmapPlugin extends CommonPlugin implements DynmapCommonAPI {
             }
         };
         onplayerjoin = core.isTrigger("playerjoin");
-        game.getEventManager().registerEvents(playerTrigger, plugin);
+        server.getEventManager().registerEvents(playerTrigger, plugin);
 //          if(onplayermove)
 //            bep.registerEvent(Event.Type.PLAYER_MOVE, playerTrigger);
 //
