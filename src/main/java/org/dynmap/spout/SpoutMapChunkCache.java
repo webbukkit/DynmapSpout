@@ -14,6 +14,7 @@ import org.dynmap.common.BiomeMap;
 import org.dynmap.utils.MapChunkCache;
 import org.dynmap.utils.MapIterator;
 import org.dynmap.utils.MapIterator.BlockStep;
+import org.spout.api.entity.BlockController;
 import org.spout.api.entity.Entity;
 import org.spout.api.geo.World;
 import org.spout.api.geo.cuboid.ChunkSnapshot;
@@ -355,9 +356,6 @@ public class SpoutMapChunkCache implements MapChunkCache {
         public Set<Entity> getEntities() {
             return null;
         }
-        public byte getSkyLight(int x, int y, int z) {
-            return 15;
-        }
         public byte getBlockLight(int x, int y, int z) {
             return 0;
         }
@@ -368,6 +366,14 @@ public class SpoutMapChunkCache implements MapChunkCache {
         @Override
         public byte[] getSkyLight() {
             return ffbyte;
+        }
+        @Override
+        public byte getBlockSkyLight(int x, int y, int z) {
+            return 15;
+        }
+        @Override
+        public BlockController getBlockController(int x, int y, int z) {
+            return null;
         }
     }
     /**
