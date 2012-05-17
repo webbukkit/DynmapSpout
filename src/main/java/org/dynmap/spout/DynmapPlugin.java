@@ -68,8 +68,8 @@ public class DynmapPlugin extends CommonPlugin implements DynmapCommonAPI {
      * Server access abstraction class
      */
     public class SpoutServer implements DynmapServerInterface {
-        public void scheduleServerTask(Runnable run, long delay) {
-            Spout.getScheduler().scheduleSyncDelayedTask(DynmapPlugin.this, run, delay);
+        public void scheduleServerTask(final Runnable run, long delay) {
+            Spout.getScheduler().scheduleSyncDelayedTask(DynmapPlugin.this, run, delay * 50);
         }
         
         public DynmapPlayer[] getOnlinePlayers() {
@@ -186,6 +186,7 @@ public class DynmapPlugin extends CommonPlugin implements DynmapCommonAPI {
                         public void execute(Event evt) {
                             BlockChangeEvent bce = (BlockChangeEvent)evt;
                             Block b = bce.getBlock();
+                            Log.info("BlockChangeEvent:" + b.getPosition());
                             core.listenerManager.processBlockEvent(EventType.BLOCK_BREAK, b.getMaterial().getId(),
                                     b.getWorld().getName(), b.getX(), b.getY(), b.getZ());
                         }
@@ -432,7 +433,7 @@ public class DynmapPlugin extends CommonPlugin implements DynmapCommonAPI {
                         core.listenerManager.processWorldEvent(EventType.WORLD_LOAD, w);
                 }
             }
-        }, 100);
+        }, 100 * 50);
     
         /* Register our update trigger events */
         registerEvents();
@@ -784,6 +785,7 @@ public class DynmapPlugin extends CommonPlugin implements DynmapCommonAPI {
             @SuppressWarnings("unused")
             @EventHandler(order=Order.MONITOR)
             void handleBlockChange(BlockChangeEvent event) {
+                Log.info("handleBlockChangeEvent(" + event + ")");
                 if(event.isCancelled())
                     return;
                 Point p = event.getBlock().getPosition();

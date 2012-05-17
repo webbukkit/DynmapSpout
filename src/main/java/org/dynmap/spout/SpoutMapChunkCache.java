@@ -16,7 +16,9 @@ import org.dynmap.utils.MapIterator;
 import org.dynmap.utils.MapIterator.BlockStep;
 import org.spout.api.entity.BlockController;
 import org.spout.api.entity.Entity;
+import org.spout.api.geo.LoadGenerateOption;
 import org.spout.api.geo.World;
+import org.spout.api.geo.cuboid.Chunk;
 import org.spout.api.geo.cuboid.ChunkSnapshot;
 import org.spout.api.geo.cuboid.Region;
 import org.spout.api.material.BlockMaterial;
@@ -367,11 +369,9 @@ public class SpoutMapChunkCache implements MapChunkCache {
         public byte[] getSkyLight() {
             return ffbyte;
         }
-        @Override
         public byte getBlockSkyLight(int x, int y, int z) {
-            return 15;
+            return 0xF;
         }
-        @Override
         public BlockController getBlockController(int x, int y, int z) {
             return null;
         }
@@ -444,12 +444,38 @@ public class SpoutMapChunkCache implements MapChunkCache {
                 }
             }
             chunks_attempted++;
+
+            int rx = chunk.x >> Region.REGION_SIZE_BITS;
+            int ry = 0;
+            int rz = chunk.z >> Region.REGION_SIZE_BITS;
+            Region r = null;
             /* Loop through chunks in Y axis */
             for(int yy = 0; yy <= y_max; yy++) {
-                org.spout.api.geo.cuboid.Chunk c = w.getChunk(chunk.x, yy, chunk.z, false);
+                int nry = yy >> Region.REGION_SIZE_BITS;
+                if(nry != ry) {
+                    r = null;
+                    ry = nry;
+                }
+                if(r == null) {
+                    r = w.getRegion(rx, ry, rz, LoadGenerateOption.LOAD_IF_NEEDED);
+                }
+                if(r == null) continue;
+                Chunk c = r.getChunk(chunk.x & 0xF, yy & 0xF, chunk.z & 0xF, LoadGenerateOption.LOAD_IF_NEEDED);
                 ChunkSnapshot b = null;
                 if(c != null) {
                     b = c.getSnapshot(false);
+                    //if(!loaded) {
+                    //    w.unloadChunk(chunk.x, yy, chunk.z, false);
+                    //}
+                    /* Test if chunk is empty */
+                    if(b != null) {
+                        short[] bids = b.getBlockIds();
+                        byte[] blight = b.getBlockLight();
+                        byte[] slight = b.getSkyLight();
+                        if(Arrays.equals(bids, zero) && Arrays.equals(blight, zerobyte) && Arrays.equals(slight, ffbyte)) {
+                            b = EMPTY;
+                        }
+                    }
                 }
                 snaparray[(chunk.x-x_min) + (chunk.z - z_min)*x_dim + (yy*xz_dim)] = b;
             }
