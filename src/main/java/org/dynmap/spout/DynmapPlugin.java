@@ -4,6 +4,7 @@ import java.io.File;
 import java.net.InetSocketAddress;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
@@ -14,6 +15,7 @@ import org.dynmap.DynmapCore;
 import org.dynmap.DynmapLocation;
 import org.dynmap.DynmapWorld;
 import org.dynmap.Log;
+import org.dynmap.DynmapChunk;
 import org.dynmap.common.BiomeMap;
 import org.dynmap.common.DynmapCommandSender;
 import org.dynmap.common.DynmapPlayer;
@@ -21,6 +23,7 @@ import org.dynmap.common.DynmapServerInterface;
 import org.dynmap.common.DynmapListenerManager.EventType;
 import org.dynmap.markers.MarkerAPI;
 import org.dynmap.spout.permissions.PermissionProvider;
+import org.dynmap.utils.MapChunkCache;
 import org.spout.api.command.Command;
 import org.spout.api.command.CommandSource;
 import org.spout.api.command.RawCommandExecutor;
@@ -277,6 +280,37 @@ public class DynmapPlugin extends CommonPlugin implements DynmapCommonAPI {
                 return p.hasPermission("dynmap." + perm);
             }
             return false;
+        }
+        /**
+         * Render processor helper - used by code running on render threads to request chunk snapshot cache from server/sync thread
+         */
+        public MapChunkCache createMapChunkCache(DynmapWorld w, List<DynmapChunk> chunks, 
+                boolean blockdata, boolean highesty, boolean biome, boolean rawbiome) {
+            MapChunkCache c = w.getChunkCache(chunks);
+            if(w.visibility_limits != null) {
+                for(MapChunkCache.VisibilityLimit limit: w.visibility_limits) {
+                    c.setVisibleRange(limit);
+                }
+                c.setHiddenFillStyle(w.hiddenchunkstyle);
+                c.setAutoGenerateVisbileRanges(w.do_autogenerate);
+            }
+            if(w.hidden_limits != null) {
+                for(MapChunkCache.VisibilityLimit limit: w.hidden_limits) {
+                    c.setHiddenRange(limit);
+                }
+                c.setHiddenFillStyle(w.hiddenchunkstyle);
+            }
+            if(c.setChunkDataTypes(blockdata, biome, highesty, rawbiome) == false) {
+                Log.severe("Spout build does not support biome APIs");
+            }
+            if(chunks.size() == 0) {    /* No chunks to get? */
+                c.loadChunks(0);
+                return c;
+            }
+            while(!c.isDoneLoading()) {
+                c.loadChunks(chunks.size());
+            }
+            return c;
         }
     }
     /**
