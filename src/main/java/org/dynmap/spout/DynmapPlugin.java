@@ -45,6 +45,7 @@ import org.spout.api.player.Player;
 import org.spout.api.plugin.CommonPlugin;
 import org.spout.api.plugin.PluginDescriptionFile;
 import org.spout.api.plugin.PluginManager;
+import org.spout.api.scheduler.TaskPriority;
 import org.spout.api.util.Named;
 import org.spout.api.ChatColor;
 import org.spout.api.Server;
@@ -72,7 +73,7 @@ public class DynmapPlugin extends CommonPlugin implements DynmapCommonAPI {
      */
     public class SpoutServer implements DynmapServerInterface {
         public void scheduleServerTask(final Runnable run, long delay) {
-            Spout.getScheduler().scheduleSyncDelayedTask(DynmapPlugin.this, run, delay * 50);
+            Spout.getScheduler().scheduleSyncDelayedTask(DynmapPlugin.this, run, delay * 50, TaskPriority.NORMAL);
         }
         
         public DynmapPlayer[] getOnlinePlayers() {
@@ -467,7 +468,7 @@ public class DynmapPlugin extends CommonPlugin implements DynmapCommonAPI {
                         core.listenerManager.processWorldEvent(EventType.WORLD_LOAD, w);
                 }
             }
-        }, 100 * 50);
+        }, 100 * 50, TaskPriority.NORMAL);
     
         /* Register our update trigger events */
         registerEvents();
