@@ -368,10 +368,13 @@ public class DynmapPlugin extends CommonPlugin implements DynmapCommonAPI {
 
         public int getHealth() {
             Entity e = player.getEntity();
-            if(e != null) 
-                return e.getHealth();
-            else
+            if(e != null) {
+                //TODO - return e.getHealth():
                 return 0;
+            }
+            else {
+                return 0;
+            }
         }
 
         public int getArmorPoints() {
