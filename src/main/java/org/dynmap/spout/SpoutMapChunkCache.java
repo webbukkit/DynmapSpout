@@ -23,6 +23,9 @@ import org.spout.api.geo.cuboid.Chunk;
 import org.spout.api.geo.cuboid.ChunkSnapshot;
 import org.spout.api.geo.cuboid.Region;
 import org.spout.api.material.BlockMaterial;
+import org.spout.api.material.Material;
+import org.spout.api.material.MaterialRegistry;
+import org.spout.vanilla.material.VanillaMaterial;
 
 /**
  * Container for managing chunks - dependent upon using chunk snapshots, since rendering is off server thread
@@ -45,6 +48,8 @@ public class SpoutMapChunkCache implements MapChunkCache {
     private long total_loadtime;    /* Total time loading chunks, in nanoseconds */
     
     private long exceptions;
+    
+    private static int[] blkidmap = null;    
     
     private static final BlockStep unstep[] = { BlockStep.X_MINUS, BlockStep.Y_MINUS, BlockStep.Z_MINUS,
         BlockStep.X_PLUS, BlockStep.Y_PLUS, BlockStep.Z_PLUS };
@@ -80,11 +85,12 @@ public class SpoutMapChunkCache implements MapChunkCache {
             snapids = snap.getBlockIds();
             snapdata = snap.getBlockData();
             snapemit = snap.getBlockLight();
-            snapsky = snap.getSkyLight();
+            //TODO - when working in Spout snapsky = snap.getSkyLight();
+            snapsky = ffbyte;
             laststep = BlockStep.Y_MINUS;
         }
         public final int getBlockTypeID() {
-            return snapids[off];
+            return blkidmap[snapids[off]];
         }
         public final int getBlockData() {
             return snapdata[off];
@@ -140,7 +146,7 @@ public class SpoutMapChunkCache implements MapChunkCache {
                     snapids = snap.getBlockIds();
                     snapdata = snap.getBlockData();
                     snapemit = snap.getBlockLight();
-                    snapsky = snap.getSkyLight();
+                    //snapsky = snap.getSkyLight();
                 }
                 break;
             case 1:
@@ -160,7 +166,7 @@ public class SpoutMapChunkCache implements MapChunkCache {
                     snapids = snap.getBlockIds();
                     snapdata = snap.getBlockData();
                     snapemit = snap.getBlockLight();
-                    snapsky = snap.getSkyLight();
+                    //snapsky = snap.getSkyLight();
                 }
                 break;
             case 2:
@@ -180,7 +186,7 @@ public class SpoutMapChunkCache implements MapChunkCache {
                     snapids = snap.getBlockIds();
                     snapdata = snap.getBlockData();
                     snapemit = snap.getBlockLight();
-                    snapsky = snap.getSkyLight();
+                    //snapsky = snap.getSkyLight();
                 }
                 break;
             case 3:
@@ -200,7 +206,7 @@ public class SpoutMapChunkCache implements MapChunkCache {
                     snapids = snap.getBlockIds();
                     snapdata = snap.getBlockData();
                     snapemit = snap.getBlockLight();
-                    snapsky = snap.getSkyLight();
+                    //snapsky = snap.getSkyLight();
                 }
                 break;
             case 4:
@@ -220,7 +226,7 @@ public class SpoutMapChunkCache implements MapChunkCache {
                     snapids = snap.getBlockIds();
                     snapdata = snap.getBlockData();
                     snapemit = snap.getBlockLight();
-                    snapsky = snap.getSkyLight();
+                    //snapsky = snap.getSkyLight();
                 }
                 break;
             case 5:
@@ -240,7 +246,7 @@ public class SpoutMapChunkCache implements MapChunkCache {
                     snapids = snap.getBlockIds();
                     snapdata = snap.getBlockData();
                     snapemit = snap.getBlockLight();
-                    snapsky = snap.getSkyLight();
+                    //snapsky = snap.getSkyLight();
                 }
                 break;
             }
@@ -279,7 +285,7 @@ public class SpoutMapChunkCache implements MapChunkCache {
         public final int getBlockTypeIDAt(BlockStep s) {
             BlockStep ls = laststep;
             stepPosition(s);
-            int tid = snapids[off];
+            int tid = blkidmap[snapids[off]];
             unstepPosition();
             laststep = ls;
             return tid;
@@ -376,7 +382,6 @@ public class SpoutMapChunkCache implements MapChunkCache {
         public BlockController getBlockController(int x, int y, int z) {
             return null;
         }
-        @Override
         public Biome getBiomeType(int x, int y, int z) {
             return null;
         }
@@ -385,6 +390,9 @@ public class SpoutMapChunkCache implements MapChunkCache {
      * Construct empty cache
      */
     public SpoutMapChunkCache() {
+        if(blkidmap == null) {
+            initMaterialMap();
+        }
     }
     public void setChunks(SpoutWorld dw, List<DynmapChunk> chunks) {
         w = dw.getWorld();
@@ -657,5 +665,18 @@ public class SpoutMapChunkCache implements MapChunkCache {
         ChunkSnapshot ss = snaparray[(sx - x_min) + (sz - z_min) * x_dim + (sy * xz_dim)];
         return (ss == EMPTY);
     }
-
+    public static void initMaterialMap() {
+        int[] bids = new int[0x8000];
+        for(int i = 0; i < bids.length; i++) {
+            BlockMaterial bm = BlockMaterial.get((short)i);
+            if((bm != null) && (bm instanceof VanillaMaterial)) {
+                VanillaMaterial vm = (VanillaMaterial)bm;
+                bids[i] = vm.getMinecraftId();
+            }
+        }
+        blkidmap = bids;
+        for(int i = 0; i < 512; i++) {
+            Log.info("map value " + i + " to " + bids[i]);
+        }
+    }
 }
