@@ -35,6 +35,10 @@ import org.spout.api.event.EventHandler;
 import org.spout.api.event.Listener;
 import org.spout.api.event.Order;
 import org.spout.api.event.block.BlockChangeEvent;
+import org.spout.api.event.chunk.ChunkLoadEvent;
+import org.spout.api.event.chunk.ChunkPopulateEvent;
+import org.spout.api.event.chunk.ChunkUnloadEvent;
+import org.spout.api.event.chunk.ChunkUpdatedEvent;
 //import org.spout.api.event.chunk.ChunkLoadEvent;
 //import org.spout.api.event.chunk.ChunkPopulateEvent;
 //import org.spout.api.event.chunk.ChunkUnloadEvent;
@@ -860,7 +864,7 @@ public class DynmapPlugin extends CommonPlugin implements DynmapCommonAPI {
         };
         onplayerjoin = core.isTrigger("playerjoin");
         server.getEventManager().registerEvents(playerTrigger, plugin);
-/*        
+
         Listener chunkTrigger = new Listener() {
             @EventHandler
             void handleChunkPopulated(ChunkPopulateEvent evt) {
@@ -876,9 +880,10 @@ public class DynmapPlugin extends CommonPlugin implements DynmapCommonAPI {
                 int cx = c.getX() << Chunk.CHUNK_SIZE_BITS;
                 int cy = c.getY() << Chunk.CHUNK_SIZE_BITS;
                 int cz = c.getZ() << Chunk.CHUNK_SIZE_BITS;
-                List<Vector3> pts = evt.getBlocksUpdated();
-                if(pts != null) {
-                    for(Vector3 v : pts) {
+                int cnt = evt.getBlockUpdateCount();
+                if (cnt >= 0) {
+                    for (int i = 0; i < cnt; i++) {
+                        Vector3 v = evt.getBlockUpdate(i);
                         core.mapManager.touch(c.getWorld().getName(), cx+(int)v.getX(), cy+(int)v.getY(), cz+(int)v.getZ(), "blockupdated");
                     }
                 }
@@ -888,7 +893,6 @@ public class DynmapPlugin extends CommonPlugin implements DynmapCommonAPI {
             }
         };
         server.getEventManager().registerEvents(chunkTrigger, plugin);
-        */
 //          if(onplayermove)
 //            bep.registerEvent(Event.Type.PLAYER_MOVE, playerTrigger);
 //

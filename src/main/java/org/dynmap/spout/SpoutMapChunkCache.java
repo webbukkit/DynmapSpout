@@ -675,8 +675,5 @@ public class SpoutMapChunkCache implements MapChunkCache {
             }
         }
         blkidmap = bids;
-        for(int i = 0; i < 512; i++) {
-            Log.info("map value " + i + " to " + bids[i]);
-        }
     }
 }
