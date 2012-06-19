@@ -14,10 +14,10 @@ import org.dynmap.common.BiomeMap;
 import org.dynmap.utils.MapChunkCache;
 import org.dynmap.utils.MapIterator;
 import org.dynmap.utils.MapIterator.BlockStep;
-import org.spout.api.entity.BlockController;
 import org.spout.api.entity.Entity;
+import org.spout.api.entity.component.controller.BlockController;
 import org.spout.api.generator.biome.Biome;
-import org.spout.api.geo.LoadGenerateOption;
+import org.spout.api.geo.LoadOption;
 import org.spout.api.geo.World;
 import org.spout.api.geo.cuboid.Chunk;
 import org.spout.api.geo.cuboid.ChunkSnapshot;
@@ -379,10 +379,15 @@ public class SpoutMapChunkCache implements MapChunkCache {
         public byte getBlockSkyLight(int x, int y, int z) {
             return 0xF;
         }
-        public BlockController getBlockController(int x, int y, int z) {
+        public Biome getBiomeType(int x, int y, int z) {
             return null;
         }
-        public Biome getBiomeType(int x, int y, int z) {
+        @Override
+        public int getBlockFullState(int x, int y, int z) {
+            return 0;
+        }
+        @Override
+        public BlockController getBlockController(int x, int y, int z) {
             return null;
         }
     }
@@ -458,22 +463,22 @@ public class SpoutMapChunkCache implements MapChunkCache {
             }
             chunks_attempted++;
 
-            int rx = chunk.x >> Region.REGION_SIZE_BITS;
+            int rx = chunk.x >> Region.CHUNKS.BITS;
             int ry = 0;
-            int rz = chunk.z >> Region.REGION_SIZE_BITS;
+            int rz = chunk.z >> Region.CHUNKS.BITS;
             Region r = null;
             /* Loop through chunks in Y axis */
             for(int yy = 0; yy <= y_max; yy++) {
-                int nry = yy >> Region.REGION_SIZE_BITS;
+                int nry = yy >> Region.CHUNKS.BITS;
                 if(nry != ry) {
                     r = null;
                     ry = nry;
                 }
                 if(r == null) {
-                    r = w.getRegion(rx, ry, rz, LoadGenerateOption.LOAD_IF_NEEDED);
+                    r = w.getRegion(rx, ry, rz, LoadOption.LOAD_ONLY);
                 }
                 if(r == null) continue;
-                Chunk c = r.getChunk(chunk.x & 0xF, yy & 0xF, chunk.z & 0xF, LoadGenerateOption.LOAD_IF_NEEDED);
+                Chunk c = r.getChunk(chunk.x & 0xF, yy & 0xF, chunk.z & 0xF, LoadOption.LOAD_ONLY);
                 ChunkSnapshot b = null;
                 if(c != null) {
                     b = c.getSnapshot(false);

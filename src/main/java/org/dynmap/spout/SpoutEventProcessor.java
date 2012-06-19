@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import org.spout.api.Spout;
 import org.spout.api.event.Event;
 import org.spout.api.event.EventExecutor;
 import org.spout.api.event.Order;
@@ -48,7 +49,7 @@ public class SpoutEventProcessor {
         if(x == null) {
             x = new Executor();
             event_handlers.put(type, x);
-            plugin.getGame().getEventManager().registerEvent(type, Order.MONITOR, x, plugin);
+            Spout.getEventManager().registerEvent(type, Order.MONITOR, x, plugin);
         }
         x.lst.add(listener);
     }

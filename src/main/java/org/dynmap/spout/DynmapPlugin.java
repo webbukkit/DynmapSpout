@@ -869,17 +869,17 @@ public class DynmapPlugin extends CommonPlugin implements DynmapCommonAPI {
             @EventHandler
             void handleChunkPopulated(ChunkPopulateEvent evt) {
                 Chunk c = evt.getChunk();
-                int cx = c.getX() << Chunk.CHUNK_SIZE_BITS;
-                int cy = c.getY() << Chunk.CHUNK_SIZE_BITS;
-                int cz = c.getZ() << Chunk.CHUNK_SIZE_BITS;
+                int cx = c.getX() << Chunk.BLOCKS.BITS;
+                int cy = c.getY() << Chunk.BLOCKS.BITS;
+                int cz = c.getZ() << Chunk.BLOCKS.BITS;
                 core.mapManager.touchVolume(c.getWorld().getName(), cx, cy, cz, cx+15, cy+15, cz+15, "chunkpopulated");
             }
             @EventHandler
             void handleChunkUpdated(ChunkUpdatedEvent evt) {
                 Chunk c = evt.getChunk();
-                int cx = c.getX() << Chunk.CHUNK_SIZE_BITS;
-                int cy = c.getY() << Chunk.CHUNK_SIZE_BITS;
-                int cz = c.getZ() << Chunk.CHUNK_SIZE_BITS;
+                int cx = c.getX() << Chunk.BLOCKS.BITS;
+                int cy = c.getY() << Chunk.BLOCKS.BITS;
+                int cz = c.getZ() << Chunk.BLOCKS.BITS;
                 int cnt = evt.getBlockUpdateCount();
                 if (cnt >= 0) {
                     for (int i = 0; i < cnt; i++) {
