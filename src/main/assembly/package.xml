@@ -23,5 +23,9 @@
   	  <outputDirectory>/</outputDirectory>
   	  <destName>dynmap.jar</destName>
 	</file>
+  	<file>
+  		<source>${project.basedir}/LICENSE</source>
+  		<outputDirectory>/dynmap</outputDirectory>
+  		<destName>LICENSE</destName></file>
   </files>
 </assembly>

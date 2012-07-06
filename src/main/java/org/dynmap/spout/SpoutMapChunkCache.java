@@ -1,5 +1,6 @@
 package org.dynmap.spout;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -17,11 +18,16 @@ import org.dynmap.utils.MapIterator.BlockStep;
 import org.spout.api.entity.Entity;
 import org.spout.api.entity.component.controller.BlockController;
 import org.spout.api.generator.biome.Biome;
+import org.spout.api.generator.biome.BiomeManager;
 import org.spout.api.geo.LoadOption;
 import org.spout.api.geo.World;
 import org.spout.api.geo.cuboid.Chunk;
 import org.spout.api.geo.cuboid.ChunkSnapshot;
+import org.spout.api.geo.cuboid.ChunkSnapshot.EntityType;
+import org.spout.api.geo.cuboid.ChunkSnapshot.ExtraData;
+import org.spout.api.geo.cuboid.ChunkSnapshot.SnapshotType;
 import org.spout.api.geo.cuboid.Region;
+import org.spout.api.map.DefaultedMap;
 import org.spout.api.material.BlockMaterial;
 import org.spout.api.material.Material;
 import org.spout.api.material.MaterialRegistry;
@@ -390,6 +396,18 @@ public class SpoutMapChunkCache implements MapChunkCache {
         public BlockController getBlockController(int x, int y, int z) {
             return null;
         }
+        @Override
+        public boolean isPopulated() {
+            return false;
+        }
+        @Override
+        public BiomeManager getBiomeManager() {
+            return null;
+        }
+        @Override
+        public DefaultedMap<String, Serializable> getDataMap() {
+            return null;
+        }
     }
     /**
      * Construct empty cache
@@ -481,7 +499,7 @@ public class SpoutMapChunkCache implements MapChunkCache {
                 Chunk c = r.getChunk(chunk.x & 0xF, yy & 0xF, chunk.z & 0xF, LoadOption.LOAD_ONLY);
                 ChunkSnapshot b = null;
                 if(c != null) {
-                    b = c.getSnapshot(false);
+                    b = c.getSnapshot(SnapshotType.BOTH, EntityType.NO_ENTITIES, ExtraData.NO_EXTRA_DATA);
                     //if(!loaded) {
                     //    w.unloadChunk(chunk.x, yy, chunk.z, false);
                     //}
