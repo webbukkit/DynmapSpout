@@ -16,7 +16,6 @@ import org.dynmap.DynmapLocation;
 import org.dynmap.DynmapWorld;
 import org.dynmap.Log;
 import org.dynmap.DynmapChunk;
-import org.dynmap.MapManager;
 import org.dynmap.common.BiomeMap;
 import org.dynmap.common.DynmapCommandSender;
 import org.dynmap.common.DynmapPlayer;
@@ -25,6 +24,7 @@ import org.dynmap.common.DynmapListenerManager.EventType;
 import org.dynmap.markers.MarkerAPI;
 import org.dynmap.spout.permissions.PermissionProvider;
 import org.dynmap.utils.MapChunkCache;
+import org.spout.api.chat.style.ChatStyle;
 import org.spout.api.command.Command;
 import org.spout.api.command.CommandSource;
 import org.spout.api.command.RawCommandExecutor;
@@ -35,9 +35,7 @@ import org.spout.api.event.EventHandler;
 import org.spout.api.event.Listener;
 import org.spout.api.event.Order;
 import org.spout.api.event.block.BlockChangeEvent;
-import org.spout.api.event.chunk.ChunkLoadEvent;
 import org.spout.api.event.chunk.ChunkPopulateEvent;
-import org.spout.api.event.chunk.ChunkUnloadEvent;
 import org.spout.api.event.chunk.ChunkUpdatedEvent;
 //import org.spout.api.event.chunk.ChunkLoadEvent;
 //import org.spout.api.event.chunk.ChunkPopulateEvent;
@@ -58,9 +56,9 @@ import org.spout.api.plugin.PluginDescriptionFile;
 import org.spout.api.plugin.PluginManager;
 import org.spout.api.scheduler.TaskPriority;
 import org.spout.api.util.Named;
-import org.spout.api.ChatColor;
 import org.spout.api.Server;
 import org.spout.api.Spout;
+import org.spout.vanilla.protocol.codec.ChatCodec;
 
 public class DynmapPlugin extends CommonPlugin implements DynmapCommonAPI {
     private final String prefix = "[Dynmap] ";
@@ -147,7 +145,7 @@ public class DynmapPlugin extends CommonPlugin implements DynmapCommonAPI {
         }
 
         public String stripChatColor(String s) {
-            return ChatColor.strip(s);
+            return ChatStyle.strip(s);
         }
         
         private Set<EventType> registered = new HashSet<EventType>();
@@ -834,7 +832,6 @@ public class DynmapPlugin extends CommonPlugin implements DynmapCommonAPI {
             @SuppressWarnings("unused")
             @EventHandler(order=Order.MONITOR)
             void handleBlockChange(BlockChangeEvent event) {
-                Log.info("handleBlockChangeEvent(" + event + ")");
                 if(event.isCancelled())
                     return;
                 Point p = event.getBlock().getPosition();
