@@ -408,6 +408,10 @@ public class SpoutMapChunkCache implements MapChunkCache {
         public DefaultedMap<String, Serializable> getDataMap() {
             return null;
         }
+        @Override
+        public byte getBlockSkyLightRaw(int x, int y, int z) {
+            return 0;
+        }
     }
     /**
      * Construct empty cache
