@@ -295,9 +295,9 @@ public class DynmapPlugin extends CommonPlugin implements DynmapCommonAPI {
         /**
          * Render processor helper - used by code running on render threads to request chunk snapshot cache from server/sync thread
          */
-        public MapChunkCache createMapChunkCache(DynmapWorld w, List<DynmapChunk> chunks, 
+        public MapChunkCache createMapChunkCache(DynmapWorld w, final List<DynmapChunk> chunks, 
                 boolean blockdata, boolean highesty, boolean biome, boolean rawbiome) {
-            MapChunkCache c = w.getChunkCache(chunks);
+            final MapChunkCache c = w.getChunkCache(chunks);
             if(w.visibility_limits != null) {
                 for(MapChunkCache.VisibilityLimit limit: w.visibility_limits) {
                     c.setVisibleRange(limit);
@@ -319,7 +319,21 @@ public class DynmapPlugin extends CommonPlugin implements DynmapCommonAPI {
                 return c;
             }
             while(!c.isDoneLoading()) {
-                c.loadChunks(chunks.size());
+                synchronized(c) {
+                    Spout.getScheduler().scheduleSyncDelayedTask(this, new Runnable() {
+                        public void run()  {
+                            c.loadChunks(chunks.size());
+                            synchronized(c) {
+                                c.notify();
+                            }
+                        }
+                    }, TaskPriority.NORMAL);
+                    try {
+                        c.wait();
+                    } catch (InterruptedException x) {
+                        return null;
+                    }
+                }
             }
             return c;
         }
@@ -999,6 +1013,10 @@ public class DynmapPlugin extends CommonPlugin implements DynmapCommonAPI {
     public boolean testIfPlayerVisibleToPlayer(String player,
             String player_to_see) {
         return core.testIfPlayerVisibleToPlayer(player, player_to_see);
+    }
+    @Override
+    public boolean testIfPlayerInfoProtected() {
+        return core.testIfPlayerInfoProtected();
     }
 
 }

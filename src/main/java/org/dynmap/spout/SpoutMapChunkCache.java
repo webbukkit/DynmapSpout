@@ -99,7 +99,7 @@ public class SpoutMapChunkCache implements MapChunkCache {
             return blkidmap[snapids[off]];
         }
         public final int getBlockData() {
-            return snapdata[off];
+            return snapdata[off] & 0xF;//TODO - is this right?
         }
         private final ChunkSnapshot getSnap(int x, int y, int z) {
             int idx = ((x>>4) - x_min) + (((z >> 4) - z_min) * x_dim) + ((y >> 4) * xz_dim);
