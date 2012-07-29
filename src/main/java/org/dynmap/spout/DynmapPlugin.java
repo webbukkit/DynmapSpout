@@ -24,6 +24,7 @@ import org.dynmap.common.DynmapListenerManager.EventType;
 import org.dynmap.markers.MarkerAPI;
 import org.dynmap.spout.permissions.PermissionProvider;
 import org.dynmap.utils.MapChunkCache;
+import org.spout.api.chat.ChatSection;
 import org.spout.api.chat.style.ChatStyle;
 import org.spout.api.command.Command;
 import org.spout.api.command.CommandSource;
@@ -188,7 +189,7 @@ public class DynmapPlugin extends CommonPlugin implements DynmapCommonAPI {
                             DynmapPlayer p = null;
                             if(event.getPlayer() != null)
                                 p = new SpoutPlayer(event.getPlayer());
-                            core.listenerManager.processChatEvent(EventType.PLAYER_CHAT, p, event.getMessage());
+                            core.listenerManager.processChatEvent(EventType.PLAYER_CHAT, p, event.getMessage().getPlainString());
                         }
                     };
                     server.getEventManager().registerEvents(chatListener, plugin);
@@ -489,8 +490,10 @@ public class DynmapPlugin extends CommonPlugin implements DynmapCommonAPI {
             public String getName() { return "dynmap"; }
         }, "dynmap");
         cmd.setRawExecutor(new RawCommandExecutor() {
-            public void execute(Command command, CommandSource sender, String[] args,
-                    int baseIndex, boolean fuzzyLookup) throws CommandException {
+            @Override
+            public void execute(Command command, CommandSource sender,
+                    String name, List<ChatSection> args, int baseIndex,
+                    boolean fuzzyLookup) throws CommandException {
                 DynmapCommandSender dsender;
                 if(sender instanceof Player) {
                     dsender = new SpoutPlayer((Player)sender);
@@ -498,9 +501,11 @@ public class DynmapPlugin extends CommonPlugin implements DynmapCommonAPI {
                 else {
                     dsender = new SpoutCommandSender(sender);
                 }
-                String[] cmdargs = new String[args.length-1];
-                System.arraycopy(args, 1, cmdargs, 0, cmdargs.length);
-                if(!core.processCommand(dsender, args[0], "dynmap", cmdargs))
+                String[] cmdargs = new String[args.size()-1];
+                for(int i = 0; i < cmdargs.length; i++) {
+                    cmdargs[i] = args.get(i+1).getPlainString();
+                }
+                if(!core.processCommand(dsender, args.get(0).getPlainString(), "dynmap", cmdargs))
                     throw new CommandException("Bad Command");
             }
         });
@@ -988,6 +993,12 @@ public class DynmapPlugin extends CommonPlugin implements DynmapCommonAPI {
     }
     public boolean setDisableChatToWebProcessing(boolean disable) {
         return core.setDisableChatToWebProcessing(disable);
+    }
+
+    @Override
+    public boolean testIfPlayerVisibleToPlayer(String player,
+            String player_to_see) {
+        return core.testIfPlayerVisibleToPlayer(player, player_to_see);
     }
 
 }
