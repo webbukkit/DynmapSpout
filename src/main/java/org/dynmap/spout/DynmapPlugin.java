@@ -337,6 +337,16 @@ public class DynmapPlugin extends CommonPlugin implements DynmapCommonAPI {
             }
             return c;
         }
+
+        @Override
+        public int getMaxPlayers() {
+            return Spout.getEngine().getMaxPlayers();
+        }
+
+        @Override
+        public int getCurrentPlayers() {
+            return Spout.getEngine().getOnlinePlayers().length;
+        }
     }
     /**
      * Player access abstraction class
