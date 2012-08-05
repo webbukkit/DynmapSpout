@@ -376,17 +376,14 @@ public class DynmapPlugin extends CommonPlugin implements DynmapCommonAPI {
         }
 
         public DynmapLocation getLocation() {
-            Point p = player.getEntity().getPosition();
+            Point p = player.getPosition();
             return toLoc(p);
         }
 
         public String getWorld() {
-            Entity e = player.getEntity();
-            if(e != null) {
-                World w = e.getWorld();
-                if(w != null) {
-                    return w.getName();
-                }
+            World w = player.getWorld();
+            if(w != null) {
+                return w.getName();
             }
             return null;
         }
@@ -401,14 +398,8 @@ public class DynmapPlugin extends CommonPlugin implements DynmapCommonAPI {
         }
 
         public int getHealth() {
-            Entity e = player.getEntity();
-            if(e != null) {
-                //TODO - return e.getHealth():
-                return 0;
-            }
-            else {
-                return 0;
-            }
+            //TODO - return e.getHealth():
+            return 0;
         }
 
         public int getArmorPoints() {
@@ -873,16 +864,14 @@ public class DynmapPlugin extends CommonPlugin implements DynmapCommonAPI {
 
         /* Register player event trigger handlers */
         Listener playerTrigger = new Listener() {
-            @SuppressWarnings("unused")
             @EventHandler
             void handlePlayerJoin(PlayerJoinEvent event) {
                 if(onplayerjoin) {
-                    Point loc = event.getPlayer().getEntity().getPosition();
+                    Point loc = event.getPlayer().getPosition();
                     core.mapManager.touch(loc.getWorld().getName(), (int)loc.getX(), (int)loc.getY(), (int)loc.getZ(), "playerjoin");
                 }
                 core.listenerManager.processPlayerEvent(EventType.PLAYER_JOIN, new SpoutPlayer(event.getPlayer()));
             }
-            @SuppressWarnings("unused")
             @EventHandler
             void handlePlayerLeave(PlayerLeaveEvent event) {
                 core.listenerManager.processPlayerEvent(EventType.PLAYER_QUIT, new SpoutPlayer(event.getPlayer()));
