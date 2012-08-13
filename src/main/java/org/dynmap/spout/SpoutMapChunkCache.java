@@ -14,9 +14,9 @@ import org.dynmap.Log;
 import org.dynmap.common.BiomeMap;
 import org.dynmap.utils.MapChunkCache;
 import org.dynmap.utils.MapIterator;
-import org.dynmap.utils.MapIterator.BlockStep;
+import org.dynmap.utils.BlockStep;
 import org.spout.api.entity.Entity;
-import org.spout.api.entity.component.controller.BlockController;
+import org.spout.api.entity.controller.BlockController;
 import org.spout.api.generator.biome.Biome;
 import org.spout.api.generator.biome.BiomeManager;
 import org.spout.api.geo.LoadOption;
@@ -29,8 +29,7 @@ import org.spout.api.geo.cuboid.ChunkSnapshot.SnapshotType;
 import org.spout.api.geo.cuboid.Region;
 import org.spout.api.map.DefaultedMap;
 import org.spout.api.material.BlockMaterial;
-import org.spout.api.material.Material;
-import org.spout.api.material.MaterialRegistry;
+import org.spout.api.util.thread.SnapshotRead;
 import org.spout.vanilla.material.VanillaMaterial;
 
 /**
@@ -368,7 +367,7 @@ public class SpoutMapChunkCache implements MapChunkCache {
         public Region getRegion() {
             return null;
         }
-        public Set<Entity> getEntities() {
+        public List<Entity> getEntities() {
             return null;
         }
         public byte getBlockLight(int x, int y, int z) {
@@ -393,10 +392,6 @@ public class SpoutMapChunkCache implements MapChunkCache {
             return 0;
         }
         @Override
-        public BlockController getBlockController(int x, int y, int z) {
-            return null;
-        }
-        @Override
         public boolean isPopulated() {
             return false;
         }
@@ -411,6 +406,11 @@ public class SpoutMapChunkCache implements MapChunkCache {
         @Override
         public byte getBlockSkyLightRaw(int x, int y, int z) {
             return 0;
+        }
+        @Override
+        @SnapshotRead
+        public BlockController getBlockController(int x, int y, int z) {
+            return null;
         }
     }
     /**

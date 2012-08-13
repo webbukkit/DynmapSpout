@@ -29,7 +29,7 @@ import org.spout.api.chat.style.ChatStyle;
 import org.spout.api.command.Command;
 import org.spout.api.command.CommandSource;
 import org.spout.api.command.RawCommandExecutor;
-import org.spout.api.entity.Entity;
+import org.spout.api.entity.Player;
 import org.spout.api.event.Event;
 import org.spout.api.event.EventExecutor;
 import org.spout.api.event.EventHandler;
@@ -51,7 +51,6 @@ import org.spout.api.geo.cuboid.Block;
 import org.spout.api.geo.cuboid.Chunk;
 import org.spout.api.geo.discrete.Point;
 import org.spout.api.math.Vector3;
-import org.spout.api.player.Player;
 import org.spout.api.plugin.CommonPlugin;
 import org.spout.api.plugin.PluginDescriptionFile;
 import org.spout.api.plugin.PluginManager;
@@ -59,7 +58,6 @@ import org.spout.api.scheduler.TaskPriority;
 import org.spout.api.util.Named;
 import org.spout.api.Server;
 import org.spout.api.Spout;
-import org.spout.vanilla.protocol.codec.ChatCodec;
 
 public class DynmapPlugin extends CommonPlugin implements DynmapCommonAPI {
     private final String prefix = "[Dynmap] ";
