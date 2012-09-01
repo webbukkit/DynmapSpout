@@ -338,12 +338,12 @@ public class DynmapPlugin extends CommonPlugin implements DynmapCommonAPI {
 
         @Override
         public int getMaxPlayers() {
-            return Spout.getEngine().getMaxPlayers();
+            return ((Server)Spout.getEngine()).getMaxPlayers();
         }
 
         @Override
         public int getCurrentPlayers() {
-            return Spout.getEngine().getOnlinePlayers().length;
+            return ((Server)Spout.getEngine()).getOnlinePlayers().length;
         }
     }
     /**
