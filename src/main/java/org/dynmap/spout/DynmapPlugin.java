@@ -499,10 +499,7 @@ public class DynmapPlugin extends CommonPlugin implements DynmapCommonAPI {
         /* Register our update trigger events */
         registerEvents();
         
-        Command cmd = server.getRootCommand().addSubCommand(new Named() {
-            public String getName() { return "dynmap"; }
-        }, "dynmap");
-        cmd.setRawExecutor(new RawCommandExecutor() {
+        RawCommandExecutor rcx = new RawCommandExecutor() {
             @Override
             public void execute(Command command, CommandSource sender,
                     String name, List<ChatSection> args, int baseIndex,
@@ -514,14 +511,25 @@ public class DynmapPlugin extends CommonPlugin implements DynmapCommonAPI {
                 else {
                     dsender = new SpoutCommandSender(sender);
                 }
-                String[] cmdargs = new String[args.size()-1];
-                for(int i = 0; i < cmdargs.length; i++) {
-                    cmdargs[i] = args.get(i+1).getPlainString();
+                if(args.size() < 1) {
+                    return;
                 }
-                if(!core.processCommand(dsender, args.get(0).getPlainString(), "dynmap", cmdargs))
+                String[] cmdargs = new String[args.size()];
+                for(int i = 0; i < cmdargs.length; i++) {
+                    cmdargs[i] = args.get(i).getPlainString();
+                }
+                if(!core.processCommand(dsender, name, "dynmap", cmdargs))
                     throw new CommandException("Bad Command");
             }
-        });
+        };
+                
+        Command cmd = server.getRootCommand().addSubCommand(this, "dynmap");
+        cmd.setRawExecutor(rcx);
+        Command cmd2 = server.getRootCommand().addSubCommand(this, "dmap");
+        cmd2.setRawExecutor(rcx);
+        Command cmd3 = server.getRootCommand().addSubCommand(this, "dmarker");
+        cmd3.setRawExecutor(rcx);
+        
     }
     
     @Override
