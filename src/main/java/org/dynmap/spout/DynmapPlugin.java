@@ -24,12 +24,11 @@ import org.dynmap.common.DynmapListenerManager.EventType;
 import org.dynmap.markers.MarkerAPI;
 import org.dynmap.spout.permissions.PermissionProvider;
 import org.dynmap.utils.MapChunkCache;
-import org.spout.api.chat.ChatSection;
-import org.spout.api.chat.style.ChatStyle;
 import org.spout.api.command.Command;
 import org.spout.api.command.CommandSource;
 import org.spout.api.command.RawCommandExecutor;
-import org.spout.api.entity.Player;
+import org.spout.api.chat.ChatSection;
+import org.spout.api.chat.style.ChatStyle;
 import org.spout.api.event.Event;
 import org.spout.api.event.EventExecutor;
 import org.spout.api.event.EventHandler;
@@ -51,6 +50,7 @@ import org.spout.api.geo.cuboid.Block;
 import org.spout.api.geo.cuboid.Chunk;
 import org.spout.api.geo.discrete.Point;
 import org.spout.api.math.Vector3;
+import org.spout.api.entity.Player;
 import org.spout.api.plugin.CommonPlugin;
 import org.spout.api.plugin.PluginDescriptionFile;
 import org.spout.api.plugin.PluginManager;
@@ -374,7 +374,7 @@ public class DynmapPlugin extends CommonPlugin implements DynmapCommonAPI {
         }
 
         public DynmapLocation getLocation() {
-            Point p = player.getPosition();
+            Point p = player.getTransform().getPosition();
             return toLoc(p);
         }
 
@@ -873,7 +873,7 @@ public class DynmapPlugin extends CommonPlugin implements DynmapCommonAPI {
             @EventHandler
             void handlePlayerJoin(PlayerJoinEvent event) {
                 if(onplayerjoin) {
-                    Point loc = event.getPlayer().getPosition();
+                    Point loc = event.getPlayer().getTransform().getPosition();
                     core.mapManager.touch(loc.getWorld().getName(), (int)loc.getX(), (int)loc.getY(), (int)loc.getZ(), "playerjoin");
                 }
                 core.listenerManager.processPlayerEvent(EventType.PLAYER_JOIN, new SpoutPlayer(event.getPlayer()));

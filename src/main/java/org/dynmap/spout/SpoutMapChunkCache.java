@@ -15,9 +15,10 @@ import org.dynmap.common.BiomeMap;
 import org.dynmap.utils.MapChunkCache;
 import org.dynmap.utils.MapIterator;
 import org.dynmap.utils.BlockStep;
+import org.spout.api.component.components.BlockComponent;
+import org.spout.api.datatable.SerializableMap;
 import org.spout.api.entity.Entity;
 import org.spout.api.entity.EntitySnapshot;
-import org.spout.api.entity.controller.BlockController;
 import org.spout.api.generator.biome.Biome;
 import org.spout.api.generator.biome.BiomeManager;
 import org.spout.api.geo.LoadOption;
@@ -398,17 +399,8 @@ public class SpoutMapChunkCache implements MapChunkCache {
             return null;
         }
         @Override
-        public DefaultedMap<String, Serializable> getDataMap() {
-            return null;
-        }
-        @Override
         public byte getBlockSkyLightRaw(int x, int y, int z) {
             return 0;
-        }
-        @Override
-        @SnapshotRead
-        public BlockController getBlockController(int x, int y, int z) {
-            return null;
         }
         @Override
         public Biome getBiome(int x, int y, int z) {
@@ -418,6 +410,16 @@ public class SpoutMapChunkCache implements MapChunkCache {
         @Override
         @SnapshotRead
         public List<EntitySnapshot> getEntities() {
+            // TODO Auto-generated method stub
+            return null;
+        }
+        @Override
+        public BlockComponent getBlockComponent(int x, int y, int z) {
+            // TODO Auto-generated method stub
+            return null;
+        }
+        @Override
+        public SerializableMap getDataMap() {
             // TODO Auto-generated method stub
             return null;
         }
