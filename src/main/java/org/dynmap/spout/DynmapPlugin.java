@@ -345,6 +345,11 @@ public class DynmapPlugin extends CommonPlugin implements DynmapCommonAPI {
         public int getCurrentPlayers() {
             return ((Server)Spout.getEngine()).getOnlinePlayers().length;
         }
+
+        @Override
+        public boolean isModLoaded(String name) {
+            return false;
+        }
     }
     /**
      * Player access abstraction class
