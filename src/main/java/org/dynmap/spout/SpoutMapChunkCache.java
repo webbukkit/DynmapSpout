@@ -423,6 +423,11 @@ public class SpoutMapChunkCache implements MapChunkCache {
             // TODO Auto-generated method stub
             return null;
         }
+        @Override
+        public List<BlockComponentSnapshot> getBlockComponents() {
+            // TODO Auto-generated method stub
+            return null;
+        }
     }
     /**
      * Construct empty cache
