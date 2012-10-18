@@ -576,45 +576,6 @@ public class SpoutMapChunkCache implements MapChunkCache {
         }
     }
     /**
-     * Get block ID at coordinates
-     */
-    public int getBlockTypeID(int x, int y, int z) {
-        ChunkSnapshot ss = snaparray[((x>>4) - x_min) + ((z>>4) - z_min) * x_dim + ((y>>4) * xz_dim)];
-        return ss.getBlockIds()[((x&0xF)<<8)|((z&0xF)<<4)|(y&0xF)];
-    }
-    /**
-     * Get block data at coordiates
-     */
-    public byte getBlockData(int x, int y, int z) {
-        ChunkSnapshot ss = snaparray[((x>>4) - x_min) + ((z>>4) - z_min) * x_dim + ((y>>4) * xz_dim)];
-        return (byte)ss.getBlockData()[((x&0xF)<<8)|((z&0xF)<<4)|(y&0xF)];
-    }
-    /* Get sky light level
-     */
-    public int getBlockSkyLight(int x, int y, int z) {
-        //TODO
-        return 15;
-    }
-    /* Get emitted light level
-     */
-    public int getBlockEmittedLight(int x, int y, int z) {
-        //TODO
-        return 0;
-    }
-    public BiomeMap getBiome(int x, int z) {
-        //TODO
-        return BiomeMap.NULL;
-    }
-    public double getRawBiomeTemperature(int x, int z) {
-        //TODO
-        return 0.5;
-    }
-    public double getRawBiomeRainfall(int x, int z) {
-        //TODO
-        return 0.5;
-    }
-
-    /**
      * Get cache iterator
      */
     public MapIterator getIterator(int x, int y, int z) {
