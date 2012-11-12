@@ -119,4 +119,8 @@ public class SpoutWorld extends DynmapWorld {
     public World getWorld() {
         return world;
     }
+    @Override
+    public void setWorldUnloaded() {
+        //TODO: not supported
+    }
 }
