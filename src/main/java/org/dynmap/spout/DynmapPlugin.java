@@ -84,11 +84,14 @@ public class DynmapPlugin extends CommonPlugin implements DynmapCommonAPI {
             Spout.getScheduler().scheduleSyncDelayedTask(DynmapPlugin.this, run, delay * 50, TaskPriority.NORMAL);
         }
         
+        @Override
         public DynmapPlayer[] getOnlinePlayers() {
             Player[] players = server.getOnlinePlayers();
+            Log.info("online[cnt=" + players.length + "]");
             DynmapPlayer[] dplay = new DynmapPlayer[players.length];
             for(int i = 0; i < players.length; i++) {
                 dplay[i] = new SpoutPlayer(players[i]);
+                Log.info("online[" + i + "]=" + dplay[i].getName());
             }
             return dplay;
         }
@@ -634,6 +637,7 @@ public class DynmapPlugin extends CommonPlugin implements DynmapCommonAPI {
     }
     
     private static DynmapLocation toLoc(Point p) {
+        Log.info("toLoc(" + p.getWorld().getName() + "," + p.getX() + "," + p.getY() + "," + p.getZ());
         return new DynmapLocation(p.getWorld().getName(), p.getX(), p.getY(), p.getZ());
     }
     
@@ -877,11 +881,16 @@ public class DynmapPlugin extends CommonPlugin implements DynmapCommonAPI {
         Listener playerTrigger = new Listener() {
             @EventHandler
             void handlePlayerJoin(PlayerJoinEvent event) {
-                if(onplayerjoin) {
-                    Point loc = event.getPlayer().getTransform().getPosition();
-                    core.mapManager.touch(loc.getWorld().getName(), (int)loc.getX(), (int)loc.getY(), (int)loc.getZ(), "playerjoin");
-                }
-                core.listenerManager.processPlayerEvent(EventType.PLAYER_JOIN, new SpoutPlayer(event.getPlayer()));
+                final Player p = event.getPlayer();
+                server.getScheduler().scheduleSyncDelayedTask(this, new Runnable() {
+                    public void run() {
+                        if(onplayerjoin) {
+                            Point loc = p.getTransform().getPosition();
+                            core.mapManager.touch(loc.getWorld().getName(), (int)loc.getX(), (int)loc.getY(), (int)loc.getZ(), "playerjoin");
+                        }
+                        core.listenerManager.processPlayerEvent(EventType.PLAYER_JOIN, new SpoutPlayer(p));
+                    }
+                }, 1, TaskPriority.LOW);
             }
             @EventHandler
             void handlePlayerLeave(PlayerLeaveEvent event) {
