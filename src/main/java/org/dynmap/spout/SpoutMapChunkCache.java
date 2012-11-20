@@ -12,6 +12,8 @@ import org.dynmap.DynmapCore;
 import org.dynmap.DynmapWorld;
 import org.dynmap.Log;
 import org.dynmap.common.BiomeMap;
+import org.dynmap.hdmap.HDBlockModels;
+import org.dynmap.renderer.RenderPatchFactory;
 import org.dynmap.utils.MapChunkCache;
 import org.dynmap.utils.MapIterator;
 import org.dynmap.utils.BlockStep;
@@ -337,7 +339,44 @@ public class SpoutMapChunkCache implements MapChunkCache {
             BiomeMap bm = getBiome();
             return colormap[bm.biomeLookup(width)];
         }
-     }
+        @Override
+        public RenderPatchFactory getPatchFactory() {
+            return HDBlockModels.getPatchDefinitionFactory();
+        }
+        @Override
+        public Object getBlockTileEntityField(String fieldId) {
+            return null;
+        }
+        @Override
+        public int getBlockTypeIDAt(int xoff, int yoff, int zoff) {
+            int xx = this.x + xoff;
+            int yy = this.y + yoff;
+            int zz = this.z + zoff;
+            int idx = ((xx >> 4) - x_min) + (((zz >> 4) - z_min) * x_dim) + ((yy >> 4) * xz_dim);
+            try {
+                return blkidmap[snaparray[idx].getBlockIds()[ ((yy & 0xF)<<8) + ((zz & 0xF) << 4) + (xx & 0xF)]];
+            } catch (Exception x) {
+                return 0;
+            }
+        }
+        @Override
+        public int getBlockDataAt(int xoff, int yoff, int zoff) {
+            int xx = this.x + xoff;
+            int yy = this.y + yoff;
+            int zz = this.z + zoff;
+            int idx = ((xx >> 4) - x_min) + (((zz >> 4) - z_min) * x_dim) + ((yy >> 4) * xz_dim);
+            try {
+                return snaparray[idx].getBlockData(xx & 0xF, yy, zz & 0xF);
+            } catch (Exception x) {
+                return 0;
+            }
+        }
+        @Override
+        public Object getBlockTileEntityFieldAt(String fieldId, int xoff,
+                int yoff, int zoff) {
+            return null;
+        }
+    }
     private static final short[] zero = new short[16*16*16];
     private static final byte[] zerobyte = new byte[16*16*16/2];
     private static final byte[] ffbyte = new byte[16*16*16/2];
