@@ -443,28 +443,24 @@ public class SpoutMapChunkCache implements MapChunkCache {
         }
         @Override
         public Biome getBiome(int x, int y, int z) {
-            // TODO Auto-generated method stub
             return null;
         }
         @Override
         @SnapshotRead
         public List<EntitySnapshot> getEntities() {
-            // TODO Auto-generated method stub
-            return null;
-        }
-        @Override
-        public BlockComponent getBlockComponent(int x, int y, int z) {
-            // TODO Auto-generated method stub
             return null;
         }
         @Override
         public SerializableMap getDataMap() {
-            // TODO Auto-generated method stub
             return null;
         }
         @Override
         public List<BlockComponentSnapshot> getBlockComponents() {
-            // TODO Auto-generated method stub
+            return null;
+        }
+        @Override
+        @SnapshotRead
+        public BlockComponent getBlockComponent(int arg0, int arg1, int arg2) {
             return null;
         }
     }

@@ -1,6 +1,7 @@
 package org.dynmap.spout;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.util.Collections;
 import java.util.HashSet;
@@ -16,11 +17,13 @@ import org.dynmap.DynmapLocation;
 import org.dynmap.DynmapWorld;
 import org.dynmap.Log;
 import org.dynmap.DynmapChunk;
+import org.dynmap.MapType;
 import org.dynmap.common.BiomeMap;
 import org.dynmap.common.DynmapCommandSender;
 import org.dynmap.common.DynmapPlayer;
 import org.dynmap.common.DynmapServerInterface;
 import org.dynmap.common.DynmapListenerManager.EventType;
+import org.dynmap.hdmap.HDMap;
 import org.dynmap.markers.MarkerAPI;
 import org.dynmap.spout.permissions.PermissionProvider;
 import org.dynmap.utils.MapChunkCache;
@@ -41,6 +44,7 @@ import org.spout.api.event.player.PlayerChatEvent;
 import org.spout.api.event.player.PlayerJoinEvent;
 import org.spout.api.event.player.PlayerLeaveEvent;
 import org.spout.api.exception.CommandException;
+import org.spout.api.exception.ConfigurationException;
 import org.spout.api.geo.World;
 import org.spout.api.geo.cuboid.Block;
 import org.spout.api.geo.cuboid.Chunk;
@@ -63,6 +67,7 @@ public class DynmapPlugin extends CommonPlugin implements DynmapCommonAPI {
     private String version;
     public SpoutEventProcessor sep;
     public Server server;
+    private SpoutMetrics metrics = null;
 //TODO    public SnapshotCache sscache;
 
     public static DynmapPlugin plugin;
@@ -533,11 +538,15 @@ public class DynmapPlugin extends CommonPlugin implements DynmapCommonAPI {
         cmd2.setRawExecutor(rcx);
         Command cmd3 = server.getRootCommand().addSubCommand(this, "dmarker");
         cmd3.setRawExecutor(rcx);
-        
+        /* Start metrics */
+        this.initMetrics();
     }
     
     @Override
     public void onDisable() {
+        if(metrics != null) {
+            metrics = null;
+        }
         /* Reset registered listeners */
         sep.cleanup();
         /* Disable core */
@@ -1033,5 +1042,79 @@ public class DynmapPlugin extends CommonPlugin implements DynmapCommonAPI {
     public boolean testIfPlayerInfoProtected() {
         return core.testIfPlayerInfoProtected();
     }
-
+    
+    private void initMetrics() {
+        try {
+            metrics = new SpoutMetrics(this);
+            
+            SpoutMetrics.Graph features = metrics.createGraph("Features Used");
+            
+            features.addPlotter(new SpoutMetrics.Plotter("Internal Web Server") {
+                @Override
+                public int getValue() {
+                    if (!core.configuration.getBoolean("disable-webserver", false))
+                        return 1;
+                    return 0;
+                }
+            });
+            features.addPlotter(new SpoutMetrics.Plotter("Login Security") {
+                @Override
+                public int getValue() {
+                    if(core.configuration.getBoolean("login-enabled", false))
+                        return 1;
+                    return 0;
+                }
+            });
+            features.addPlotter(new SpoutMetrics.Plotter("Player Info Protected") {
+                @Override
+                public int getValue() {
+                    if(core.player_info_protected)
+                        return 1;
+                    return 0;
+                }
+            });
+            
+            SpoutMetrics.Graph maps = metrics.createGraph("Map Data");
+            maps.addPlotter(new SpoutMetrics.Plotter("Worlds") {
+                @Override
+                public int getValue() {
+                    if(core.mapManager != null)
+                        return core.mapManager.getWorlds().size();
+                    return 0;
+                }
+            });
+            maps.addPlotter(new SpoutMetrics.Plotter("Maps") {
+                @Override
+                public int getValue() {
+                    int cnt = 0;
+                    if(core.mapManager != null) {
+                        for(DynmapWorld w :core.mapManager.getWorlds()) {
+                            cnt += w.maps.size();
+                        }
+                    }
+                    return cnt;
+                }
+            });
+            maps.addPlotter(new SpoutMetrics.Plotter("HD Maps") {
+                @Override
+                public int getValue() {
+                    int cnt = 0;
+                    if(core.mapManager != null) {
+                        for(DynmapWorld w :core.mapManager.getWorlds()) {
+                            for(MapType mt : w.maps) {
+                                if(mt instanceof HDMap) {
+                                    cnt++;
+                                }
+                            }
+                        }
+                    }
+                    return cnt;
+                }
+            });
+            
+            metrics.start();
+        } catch (ConfigurationException e) {
+            // Failed to submit the stats :-(
+        }
+    }
 }
