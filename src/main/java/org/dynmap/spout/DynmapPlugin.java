@@ -88,11 +88,9 @@ public class DynmapPlugin extends CommonPlugin implements DynmapCommonAPI {
         @Override
         public DynmapPlayer[] getOnlinePlayers() {
             Player[] players = server.getOnlinePlayers();
-            Log.info("online[cnt=" + players.length + "]");
             DynmapPlayer[] dplay = new DynmapPlayer[players.length];
             for(int i = 0; i < players.length; i++) {
                 dplay[i] = new SpoutPlayer(players[i]);
-                Log.info("online[" + i + "]=" + dplay[i].getName());
             }
             return dplay;
         }
@@ -202,7 +200,6 @@ public class DynmapPlugin extends CommonPlugin implements DynmapCommonAPI {
                         public void execute(Event evt) {
                             BlockChangeEvent bce = (BlockChangeEvent)evt;
                             Block b = bce.getBlock();
-                            Log.info("BlockChangeEvent:" + b.getPosition());
                             core.listenerManager.processBlockEvent(EventType.BLOCK_BREAK, b.getMaterial().getId(),
                                     b.getWorld().getName(), b.getX(), b.getY(), b.getZ());
                         }
@@ -642,7 +639,6 @@ public class DynmapPlugin extends CommonPlugin implements DynmapCommonAPI {
     }
     
     private static DynmapLocation toLoc(Point p) {
-        Log.info("toLoc(" + p.getWorld().getName() + "," + p.getX() + "," + p.getY() + "," + p.getZ());
         return new DynmapLocation(p.getWorld().getName(), p.getX(), p.getY(), p.getZ());
     }
     
