@@ -98,11 +98,11 @@ public class SpoutMetrics {
     /**
      * All of the custom graphs to submit to metrics
      */
-    private final Set<SpoutMetrics.Graph> graphs = Collections.synchronizedSet(new HashSet<SpoutMetrics.Graph>());
+    private final Set<Graph> graphs = Collections.synchronizedSet(new HashSet<Graph>());
     /**
      * The default graph, used for addCustomData when you don't want a specific graph
      */
-    private final SpoutMetrics.Graph defaultGraph = new SpoutMetrics.Graph("Default");
+    private final Graph defaultGraph = new Graph("Default");
     /**
      * The plugin configuration file
      */
@@ -154,13 +154,13 @@ public class SpoutMetrics {
      * @param name The name of the graph
      * @return Graph object created. Will never return NULL under normal circumstances unless bad parameters are given
      */
-    public SpoutMetrics.Graph createGraph(final String name) {
+    public Graph createGraph(final String name) {
         if (name == null) {
             throw new IllegalArgumentException("Graph name cannot be null");
         }
 
         // Construct the graph object
-        final SpoutMetrics.Graph graph = new SpoutMetrics.Graph(name);
+        final Graph graph = new Graph(name);
 
         // Now we can add our graph
         graphs.add(graph);
@@ -174,7 +174,7 @@ public class SpoutMetrics {
      *
      * @param graph The name of the graph
      */
-    public void addGraph(final SpoutMetrics.Graph graph) {
+    public void addGraph(final Graph graph) {
         if (graph == null) {
             throw new IllegalArgumentException("Graph cannot be null");
         }
@@ -187,7 +187,7 @@ public class SpoutMetrics {
      *
      * @param plotter The plotter to use to plot custom data
      */
-    public void addCustomData(final SpoutMetrics.Plotter plotter) {
+    public void addCustomData(final Plotter plotter) {
         if (plotter == null) {
             throw new IllegalArgumentException("Plotter cannot be null");
         }
@@ -232,7 +232,7 @@ public class SpoutMetrics {
                                 plugin.getEngine().getScheduler().cancelTask(taskId);
                                 taskId = null;
                                 // Tell all plotters to stop gathering information.
-                                for (SpoutMetrics.Graph graph : graphs) {
+                                for (Graph graph : graphs) {
                                     graph.onOptOut();
                                 }
                             }
@@ -281,7 +281,7 @@ public class SpoutMetrics {
     /**
      * Enables metrics for the server by setting "opt-out" to false in the config file and starting the metrics task.
      *
-     * @throws ConfigurationException
+     * @throws org.spout.api.exception.ConfigurationException
      */
     public void enable() throws ConfigurationException {
         // This has to be synchronized or it can collide with the check in the task.
@@ -302,7 +302,7 @@ public class SpoutMetrics {
     /**
      * Disables metrics for the server by setting "opt-out" to true in the config file and canceling the metrics task.
      *
-     * @throws ConfigurationException
+     * @throws org.spout.api.exception.ConfigurationException
      */
     public void disable() throws ConfigurationException {
         // This has to be synchronized or it can collide with the check in the task.
@@ -346,7 +346,7 @@ public class SpoutMetrics {
         PluginDescriptionFile description = plugin.getDescription();
         String pluginName = description.getName();
         String pluginVersion = description.getVersion();
-        String serverVersion = Spout.getEngine().getVersion();
+        String serverVersion = "Spout " + Spout.getEngine().getVersion();
         int playersOnline;
         if (Spout.getPlatform() == Platform.SERVER) {
             playersOnline = ((Server) Spout.getEngine()).getOnlinePlayers().length;
@@ -391,12 +391,12 @@ public class SpoutMetrics {
         // Acquire a lock on the graphs, which lets us make the assumption we also lock everything
         // inside of the graph (e.g plotters)
         synchronized (graphs) {
-            final Iterator<SpoutMetrics.Graph> iter = graphs.iterator();
+            final Iterator<Graph> iter = graphs.iterator();
 
             while (iter.hasNext()) {
-                final SpoutMetrics.Graph graph = iter.next();
+                final Graph graph = iter.next();
 
-                for (SpoutMetrics.Plotter plotter : graph.getPlotters()) {
+                for (Plotter plotter : graph.getPlotters()) {
                     // The key name to send to the metrics server
                     // The format is C-GRAPHNAME-PLOTTERNAME where separator - is defined at the top
                     // Legacy (R4) submitters use the format Custom%s, or CustomPLOTTERNAME
@@ -447,12 +447,12 @@ public class SpoutMetrics {
             // Is this the first update this hour?
             if (response.contains("OK This is your first update this hour")) {
                 synchronized (graphs) {
-                    final Iterator<SpoutMetrics.Graph> iter = graphs.iterator();
+                    final Iterator<Graph> iter = graphs.iterator();
 
                     while (iter.hasNext()) {
-                        final SpoutMetrics.Graph graph = iter.next();
+                        final Graph graph = iter.next();
 
-                        for (SpoutMetrics.Plotter plotter : graph.getPlotters()) {
+                        for (Plotter plotter : graph.getPlotters()) {
                             plotter.reset();
                         }
                     }
@@ -515,7 +515,7 @@ public class SpoutMetrics {
         /**
          * The set of plotters that are contained within this graph
          */
-        private final Set<SpoutMetrics.Plotter> plotters = new LinkedHashSet<SpoutMetrics.Plotter>();
+        private final Set<Plotter> plotters = new LinkedHashSet<Plotter>();
 
         private Graph(final String name) {
             this.name = name;
@@ -535,7 +535,7 @@ public class SpoutMetrics {
          *
          * @param plotter the plotter to add to the graph
          */
-        public void addPlotter(final SpoutMetrics.Plotter plotter) {
+        public void addPlotter(final Plotter plotter) {
             plotters.add(plotter);
         }
 
@@ -544,16 +544,16 @@ public class SpoutMetrics {
          *
          * @param plotter the plotter to remove from the graph
          */
-        public void removePlotter(final SpoutMetrics.Plotter plotter) {
+        public void removePlotter(final Plotter plotter) {
             plotters.remove(plotter);
         }
 
         /**
          * Gets an <b>unmodifiable</b> set of the plotter objects in the graph
          *
-         * @return an unmodifiable {@link Set} of the plotter objects
+         * @return an unmodifiable {@link java.util.Set} of the plotter objects
          */
-        public Set<SpoutMetrics.Plotter> getPlotters() {
+        public Set<Plotter> getPlotters() {
             return Collections.unmodifiableSet(plotters);
         }
 
@@ -564,11 +564,11 @@ public class SpoutMetrics {
 
         @Override
         public boolean equals(final Object object) {
-            if (!(object instanceof SpoutMetrics.Graph)) {
+            if (!(object instanceof Graph)) {
                 return false;
             }
 
-            final SpoutMetrics.Graph graph = (SpoutMetrics.Graph) object;
+            final Graph graph = (Graph) object;
             return graph.name.equals(name);
         }
 
@@ -636,11 +636,11 @@ public class SpoutMetrics {
 
         @Override
         public boolean equals(final Object object) {
-            if (!(object instanceof SpoutMetrics.Plotter)) {
+            if (!(object instanceof Plotter)) {
                 return false;
             }
 
-            final SpoutMetrics.Plotter plotter = (SpoutMetrics.Plotter) object;
+            final Plotter plotter = (Plotter) object;
             return plotter.name.equals(name) && plotter.getValue() == getValue();
         }
     }
