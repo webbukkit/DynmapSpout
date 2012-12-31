@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.dynmap</groupId>
   <artifactId>DynmapSpout</artifactId>
-  <version>1.3</version>
+  <version>1.4</version>
   	<build>
 		<resources>
 			<resource>
@@ -138,7 +138,7 @@
     </dependency>
   	</dependencies>
   <properties>
-  	<BUILD_NUMBER>dev</BUILD_NUMBER>
+  	<BUILD_NUMBER>Dev</BUILD_NUMBER>
   	<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
 </project>
