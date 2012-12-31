@@ -20,6 +20,7 @@ import org.dynmap.DynmapChunk;
 import org.dynmap.MapType;
 import org.dynmap.common.BiomeMap;
 import org.dynmap.common.DynmapCommandSender;
+import org.dynmap.common.DynmapListenerManager.SignChangeEventListener;
 import org.dynmap.common.DynmapPlayer;
 import org.dynmap.common.DynmapServerInterface;
 import org.dynmap.common.DynmapListenerManager.EventType;
@@ -32,6 +33,8 @@ import org.spout.api.command.CommandSource;
 import org.spout.api.command.RawCommandExecutor;
 import org.spout.api.chat.ChatSection;
 import org.spout.api.chat.style.ChatStyle;
+import org.spout.api.event.Cause;
+import org.spout.api.event.cause.PlayerCause;
 import org.spout.api.event.Event;
 import org.spout.api.event.EventExecutor;
 import org.spout.api.event.EventHandler;
@@ -49,6 +52,8 @@ import org.spout.api.geo.World;
 import org.spout.api.geo.cuboid.Block;
 import org.spout.api.geo.cuboid.Chunk;
 import org.spout.api.geo.discrete.Point;
+import org.spout.api.material.BlockMaterial;
+import org.spout.api.material.Material;
 import org.spout.api.math.Vector3;
 import org.spout.api.entity.Player;
 import org.spout.api.plugin.CommonPlugin;
@@ -58,6 +63,9 @@ import org.spout.api.scheduler.TaskPriority;
 import org.spout.api.util.Named;
 import org.spout.api.Server;
 import org.spout.api.Spout;
+import org.spout.vanilla.component.substance.material.Sign;
+import org.spout.vanilla.event.block.SignUpdateEvent;
+import org.spout.vanilla.material.VanillaMaterial;
 
 public class DynmapPlugin extends CommonPlugin implements DynmapCommonAPI {
     private final String prefix = "[Dynmap] ";
@@ -81,6 +89,21 @@ public class DynmapPlugin extends CommonPlugin implements DynmapCommonAPI {
      * Server access abstraction class
      */
     public class SpoutServer implements DynmapServerInterface {
+        @Override
+        public int getBlockIDAt(String wname, int x, int y, int z) {
+            int id = -1;
+            World w = server.getWorld(wname);
+            if((w != null) && w.hasChunkAtBlock(x, y, z)) {
+                id = 0;
+                Block b = w.getBlock(x, y, z);
+                BlockMaterial m = b.getMaterial();
+                if(m instanceof VanillaMaterial) {
+                    id = ((VanillaMaterial)m).getMinecraftId();
+                }
+            }
+            return id;
+        }
+        
         public void scheduleServerTask(final Runnable run, long delay) {
             Spout.getScheduler().scheduleSyncDelayedTask(DynmapPlugin.this, run, delay * 50, TaskPriority.NORMAL);
         }
@@ -206,20 +229,29 @@ public class DynmapPlugin extends CommonPlugin implements DynmapCommonAPI {
                     });
                     break;
                 case SIGN_CHANGE:
-                    //TODO - no event yet 
-                    //bep.registerEvent(Type.SIGN_CHANGE, new BlockListener() {
-                    //    @Override
-                    //    public void onSignChange(SignChangeEvent evt) {
-                    //        Block b = evt.getBlock();
-                    //        Location l = b.getLocation();
-                    //        String[] lines = evt.getLines();    /* Note: changes to this change event - intentional */
-                    //        DynmapPlayer dp = null;
-                    //        Player p = evt.getPlayer();
-                    //        if(p != null) dp = new BukkitPlayer(p);
-                    //        core.listenerManager.processSignChangeEvent(EventType.SIGN_CHANGE, b.getType().getId(),
-                    //                l.getWorld().getName(), l.getBlockX(), l.getBlockY(), l.getBlockZ(), lines, dp);
-                    //    }
-                    //});
+                    Listener signTrigger = new Listener() {
+                        @SuppressWarnings("unused")
+                        @EventHandler(order=Order.MONITOR)
+                        void handleSignChange(SignUpdateEvent event) {
+                            if(event.isCancelled())
+                                return;
+                            Sign s = event.getSign();
+                            Point p = s.getPosition();
+                            Cause c = event.getSource();
+                            DynmapPlayer dp = null;
+                            if(c instanceof PlayerCause) {
+                                Player ply = ((PlayerCause)c).getSource();
+                                if(ply != null) {
+                                    dp = new SpoutPlayer(ply);
+                                }
+                            }
+                            String[] lines = event.getLines();
+                            core.listenerManager.processSignChangeEvent(EventType.SIGN_CHANGE, s.getBlock().getMaterial().getId(),
+                                p.getWorld().getName(), p.getBlockX(), p.getBlockY(), p.getBlockZ(), lines, dp);
+                            event.setLines(lines);
+                        }
+                    };
+                    server.getEventManager().registerEvents(signTrigger, plugin);
                     break;
                 default:
                     Log.severe("Unhandled event type: " + type);
