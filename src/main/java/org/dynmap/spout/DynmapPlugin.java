@@ -457,6 +457,12 @@ public class DynmapPlugin extends CommonPlugin implements DynmapCommonAPI {
             // TODO
             return 0;
         }
+        
+        @Override
+        public boolean isInvisible() {
+            // TODO
+            return false;
+        }
     }
     /* Handler for generic console command sender */
     public class SpoutCommandSender implements DynmapCommandSender {
