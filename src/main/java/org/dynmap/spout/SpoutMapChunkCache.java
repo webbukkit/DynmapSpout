@@ -33,6 +33,7 @@ import org.spout.api.geo.cuboid.ChunkSnapshot.SnapshotType;
 import org.spout.api.geo.cuboid.Region;
 import org.spout.api.map.DefaultedMap;
 import org.spout.api.material.BlockMaterial;
+import org.spout.api.util.cuboid.CuboidLightBuffer;
 import org.spout.vanilla.material.VanillaMaterial;
 
 /**
@@ -458,6 +459,10 @@ public class SpoutMapChunkCache implements MapChunkCache {
         }
         @Override
         public BlockComponent getBlockComponent(int arg0, int arg1, int arg2) {
+            return null;
+        }
+        @Override
+        public CuboidLightBuffer[] getLightBuffers() {
             return null;
         }
     }
