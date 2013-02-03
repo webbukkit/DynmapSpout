@@ -34,7 +34,7 @@ import org.spout.api.geo.cuboid.Region;
 import org.spout.api.map.DefaultedMap;
 import org.spout.api.material.BlockMaterial;
 import org.spout.api.util.cuboid.CuboidLightBuffer;
-import org.spout.vanilla.material.VanillaMaterial;
+import org.spout.vanilla.api.material.VanillaMaterial;
 
 /**
  * Container for managing chunks - dependent upon using chunk snapshots, since rendering is off server thread

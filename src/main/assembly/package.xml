@@ -7,9 +7,7 @@
   <fileSets>
     <fileSet>
     	<directory>${project.build.directory}/core</directory>
-    	<outputDirectory>/dynmap</outputDirectory>
-    	<excludes>
-    		<exclude>web/version.js</exclude></excludes></fileSet>
+    	<outputDirectory>/dynmap</outputDirectory></fileSet>
   </fileSets>
   <files>
   	<file>

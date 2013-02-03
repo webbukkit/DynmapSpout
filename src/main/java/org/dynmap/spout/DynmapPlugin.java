@@ -63,9 +63,10 @@ import org.spout.api.scheduler.TaskPriority;
 import org.spout.api.util.Named;
 import org.spout.api.Server;
 import org.spout.api.Spout;
-import org.spout.vanilla.component.substance.material.Sign;
-import org.spout.vanilla.event.block.SignUpdateEvent;
-import org.spout.vanilla.material.VanillaMaterial;
+import org.spout.vanilla.api.component.substance.material.SignComponent;
+import org.spout.vanilla.api.event.block.SignUpdateEvent;
+import org.spout.vanilla.api.material.VanillaMaterial;
+import org.spout.vanilla.plugin.material.item.misc.Sign;
 
 public class DynmapPlugin extends CommonPlugin implements DynmapCommonAPI {
     private final String prefix = "[Dynmap] ";
@@ -235,7 +236,7 @@ public class DynmapPlugin extends CommonPlugin implements DynmapCommonAPI {
                         void handleSignChange(SignUpdateEvent event) {
                             if(event.isCancelled())
                                 return;
-                            Sign s = event.getSign();
+                            SignComponent s = event.getSign();
                             Point p = s.getPosition();
                             Cause c = event.getSource();
                             DynmapPlayer dp = null;
@@ -412,7 +413,7 @@ public class DynmapPlugin extends CommonPlugin implements DynmapCommonAPI {
         }
 
         public DynmapLocation getLocation() {
-            Point p = player.getTransform().getPosition();
+            Point p = player.getScene().getPosition();
             return toLoc(p);
         }
 
@@ -924,7 +925,7 @@ public class DynmapPlugin extends CommonPlugin implements DynmapCommonAPI {
                 server.getScheduler().scheduleSyncDelayedTask(this, new Runnable() {
                     public void run() {
                         if(onplayerjoin) {
-                            Point loc = p.getTransform().getPosition();
+                            Point loc = p.getScene().getPosition();
                             core.mapManager.touch(loc.getWorld().getName(), (int)loc.getX(), (int)loc.getY(), (int)loc.getZ(), "playerjoin");
                         }
                         core.listenerManager.processPlayerEvent(EventType.PLAYER_JOIN, new SpoutPlayer(p));
