@@ -1,11 +1,9 @@
 package org.dynmap.spout;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.ListIterator;
-import java.util.Set;
 
 import org.dynmap.DynmapChunk;
 import org.dynmap.DynmapCore;
@@ -19,7 +17,6 @@ import org.dynmap.utils.MapIterator;
 import org.dynmap.utils.BlockStep;
 import org.spout.api.component.type.BlockComponent;
 import org.spout.api.datatable.SerializableMap;
-import org.spout.api.entity.Entity;
 import org.spout.api.entity.EntitySnapshot;
 import org.spout.api.generator.biome.Biome;
 import org.spout.api.generator.biome.BiomeManager;
@@ -31,10 +28,9 @@ import org.spout.api.geo.cuboid.ChunkSnapshot.EntityType;
 import org.spout.api.geo.cuboid.ChunkSnapshot.ExtraData;
 import org.spout.api.geo.cuboid.ChunkSnapshot.SnapshotType;
 import org.spout.api.geo.cuboid.Region;
-import org.spout.api.map.DefaultedMap;
 import org.spout.api.material.BlockMaterial;
 import org.spout.api.util.cuboid.CuboidLightBuffer;
-import org.spout.vanilla.api.material.VanillaMaterial;
+import org.spout.vanilla.material.VanillaMaterial;
 
 /**
  * Container for managing chunks - dependent upon using chunk snapshots, since rendering is off server thread
@@ -421,9 +417,6 @@ public class SpoutMapChunkCache implements MapChunkCache {
         }
         public byte getBlockSkyLight(int x, int y, int z) {
             return 0xF;
-        }
-        public Biome getBiomeType(int x, int y, int z) {
-            return null;
         }
         @Override
         public int getBlockFullState(int x, int y, int z) {

@@ -63,10 +63,9 @@ import org.spout.api.scheduler.TaskPriority;
 import org.spout.api.util.Named;
 import org.spout.api.Server;
 import org.spout.api.Spout;
-import org.spout.vanilla.api.component.substance.material.SignComponent;
-import org.spout.vanilla.api.event.block.SignUpdateEvent;
-import org.spout.vanilla.api.material.VanillaMaterial;
-import org.spout.vanilla.plugin.material.item.misc.Sign;
+import org.spout.vanilla.component.substance.material.Sign;
+import org.spout.vanilla.event.block.SignUpdateEvent;
+import org.spout.vanilla.material.VanillaMaterial;
 
 public class DynmapPlugin extends CommonPlugin implements DynmapCommonAPI {
     private final String prefix = "[Dynmap] ";
@@ -236,7 +235,7 @@ public class DynmapPlugin extends CommonPlugin implements DynmapCommonAPI {
                         void handleSignChange(SignUpdateEvent event) {
                             if(event.isCancelled())
                                 return;
-                            SignComponent s = event.getSign();
+                            Sign s = event.getSign();
                             Point p = s.getPosition();
                             Cause c = event.getSource();
                             DynmapPlayer dp = null;
