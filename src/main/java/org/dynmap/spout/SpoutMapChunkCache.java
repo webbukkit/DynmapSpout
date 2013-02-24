@@ -75,7 +75,7 @@ public class SpoutMapChunkCache implements MapChunkCache {
 
         OurMapIterator(int x0, int y0, int z0) {
             initialize(x0, y0, z0);
-            worldheight = w.getHeight();
+            worldheight = SpoutWorld.WORLDHEIGHT;
         }
         public final void initialize(int x0, int y0, int z0) {
             this.x = x0;
@@ -472,7 +472,7 @@ public class SpoutMapChunkCache implements MapChunkCache {
         this.chunks = chunks;
         this.EMPTY = new EmptySnapshot(w,0,0,0);
         this.y_min = 0;
-        this.y_max = (w.getHeight() / 16)-1;
+        this.y_max = (SpoutWorld.WORLDHEIGHT / 16)-1;
         /* Compute range */
         if(chunks.size() == 0) {
             this.x_min = 0;

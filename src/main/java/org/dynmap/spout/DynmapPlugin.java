@@ -63,7 +63,7 @@ import org.spout.api.scheduler.TaskPriority;
 import org.spout.api.util.Named;
 import org.spout.api.Server;
 import org.spout.api.Spout;
-import org.spout.vanilla.component.substance.material.Sign;
+import org.spout.vanilla.component.block.material.Sign;
 import org.spout.vanilla.event.block.SignUpdateEvent;
 import org.spout.vanilla.material.VanillaMaterial;
 

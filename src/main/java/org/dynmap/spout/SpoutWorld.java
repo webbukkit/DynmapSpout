@@ -17,10 +17,11 @@ public class SpoutWorld extends DynmapWorld {
     private World world;
     private String env;
     private boolean isnether;
+    public static int WORLDHEIGHT = 256; // Spout still screwing with API - just hard core until they get their head straight
 //TODO    private static BlockLightLevel bll = new BlockLightLevel();
     
     public SpoutWorld(World w) {
-        super(w.getName(), w.getHeight(), 64);
+        super(w.getName(), WORLDHEIGHT, 64);
         
         world = w;
         /* Hackish - but no generic way to spot nether */
@@ -81,7 +82,7 @@ public class SpoutWorld extends DynmapWorld {
     /* Get highest Y coord of given location */
     @Override
     public int getHighestBlockYAt(int x, int z) {
-        for(int y = (world.getHeight()-1); y >= 0; y--) {
+        for(int y = (WORLDHEIGHT-1); y >= 0; y--) {
             if(world.getBlockMaterial(x, y, z) != BlockMaterial.AIR)
                 return y+1;
         }
