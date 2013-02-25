@@ -28,6 +28,7 @@ import org.dynmap.hdmap.HDMap;
 import org.dynmap.markers.MarkerAPI;
 import org.dynmap.spout.permissions.PermissionProvider;
 import org.dynmap.utils.MapChunkCache;
+import org.dynmap.utils.VisibilityLimit;
 import org.spout.api.command.Command;
 import org.spout.api.command.CommandSource;
 import org.spout.api.command.RawCommandExecutor;
@@ -330,14 +331,14 @@ public class DynmapPlugin extends CommonPlugin implements DynmapCommonAPI {
                 boolean blockdata, boolean highesty, boolean biome, boolean rawbiome) {
             final MapChunkCache c = w.getChunkCache(chunks);
             if(w.visibility_limits != null) {
-                for(MapChunkCache.VisibilityLimit limit: w.visibility_limits) {
+                for(VisibilityLimit limit: w.visibility_limits) {
                     c.setVisibleRange(limit);
                 }
                 c.setHiddenFillStyle(w.hiddenchunkstyle);
                 c.setAutoGenerateVisbileRanges(w.do_autogenerate);
             }
             if(w.hidden_limits != null) {
-                for(MapChunkCache.VisibilityLimit limit: w.hidden_limits) {
+                for(VisibilityLimit limit: w.hidden_limits) {
                     c.setHiddenRange(limit);
                 }
                 c.setHiddenFillStyle(w.hiddenchunkstyle);

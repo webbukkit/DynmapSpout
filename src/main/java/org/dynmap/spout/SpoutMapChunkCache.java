@@ -31,6 +31,7 @@ import org.spout.api.geo.cuboid.Region;
 import org.spout.api.material.BlockMaterial;
 import org.spout.api.util.cuboid.CuboidLightBuffer;
 import org.spout.vanilla.material.VanillaMaterial;
+import org.dynmap.utils.VisibilityLimit;
 
 /**
  * Container for managing chunks - dependent upon using chunk snapshots, since rendering is off server thread
@@ -515,7 +516,7 @@ public class SpoutMapChunkCache implements MapChunkCache {
             if(visible_limits != null) {
                 vis = false;
                 for(VisibilityLimit limit : visible_limits) {
-                    if((chunk.x >= limit.x0) && (chunk.x <= limit.x1) && (chunk.z >= limit.z0) && (chunk.z <= limit.z1)) {
+                    if (limit.doIntersectChunk(chunk.x, chunk.z)) {
                         vis = true;
                         break;
                     }
@@ -523,7 +524,7 @@ public class SpoutMapChunkCache implements MapChunkCache {
             }
             if(vis && (hidden_limits != null)) {
                 for(VisibilityLimit limit : hidden_limits) {
-                    if((chunk.x >= limit.x0) && (chunk.x <= limit.x1) && (chunk.z >= limit.z0) && (chunk.z <= limit.z1)) {
+                    if (limit.doIntersectChunk(chunk.x, chunk.z)) {
                         vis = false;
                         break;
                     }
@@ -631,22 +632,9 @@ public class SpoutMapChunkCache implements MapChunkCache {
      * Coordinates are block coordinates
      */
     public void setVisibleRange(VisibilityLimit lim) {
-        VisibilityLimit limit = new VisibilityLimit();
-        if(lim.x0 > lim.x1) {
-            limit.x0 = (lim.x1 >> 4); limit.x1 = ((lim.x0+15) >> 4);
-        }
-        else {
-            limit.x0 = (lim.x0 >> 4); limit.x1 = ((lim.x1+15) >> 4);
-        }
-        if(lim.z0 > lim.z1) {
-            limit.z0 = (lim.z1 >> 4); limit.z1 = ((lim.z0+15) >> 4);
-        }
-        else {
-            limit.z0 = (lim.z0 >> 4); limit.z1 = ((lim.z1+15) >> 4);
-        }
         if(visible_limits == null)
             visible_limits = new ArrayList<VisibilityLimit>();
-        visible_limits.add(limit);
+        visible_limits.add(lim);
     }
     /**
      * Add hidden area limit - can be called more than once 
@@ -654,22 +642,9 @@ public class SpoutMapChunkCache implements MapChunkCache {
      * Coordinates are block coordinates
      */
     public void setHiddenRange(VisibilityLimit lim) {
-        VisibilityLimit limit = new VisibilityLimit();
-        if(lim.x0 > lim.x1) {
-            limit.x0 = (lim.x1 >> 4); limit.x1 = ((lim.x0+15) >> 4);
-        }
-        else {
-            limit.x0 = (lim.x0 >> 4); limit.x1 = ((lim.x1+15) >> 4);
-        }
-        if(lim.z0 > lim.z1) {
-            limit.z0 = (lim.z1 >> 4); limit.z1 = ((lim.z0+15) >> 4);
-        }
-        else {
-            limit.z0 = (lim.z0 >> 4); limit.z1 = ((lim.z1+15) >> 4);
-        }
         if(hidden_limits == null)
             hidden_limits = new ArrayList<VisibilityLimit>();
-        hidden_limits.add(limit);
+        hidden_limits.add(lim);
     }
 
     public boolean setChunkDataTypes(boolean blockdata, boolean biome, boolean highestblocky, boolean rawbiome) {
