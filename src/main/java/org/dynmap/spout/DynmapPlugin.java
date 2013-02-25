@@ -335,7 +335,6 @@ public class DynmapPlugin extends CommonPlugin implements DynmapCommonAPI {
                     c.setVisibleRange(limit);
                 }
                 c.setHiddenFillStyle(w.hiddenchunkstyle);
-                c.setAutoGenerateVisbileRanges(w.do_autogenerate);
             }
             if(w.hidden_limits != null) {
                 for(VisibilityLimit limit: w.hidden_limits) {

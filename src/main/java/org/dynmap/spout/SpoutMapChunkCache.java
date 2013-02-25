@@ -618,15 +618,6 @@ public class SpoutMapChunkCache implements MapChunkCache {
     public void setHiddenFillStyle(HiddenChunkStyle style) {
     }
     /**
-     * Set autogenerate - must be done after at least one visible range has been set
-     */
-    public void setAutoGenerateVisbileRanges(DynmapWorld.AutoGenerateOption generateopt) {
-        if((generateopt != DynmapWorld.AutoGenerateOption.NONE) && ((visible_limits == null) || (visible_limits.size() == 0))) {
-            Log.severe("Cannot setAutoGenerateVisibleRanges() without visible ranges defined");
-            return;
-        }
-    }
-    /**
      * Add visible area limit - can be called more than once 
      * Needs to be set before chunks are loaded
      * Coordinates are block coordinates
