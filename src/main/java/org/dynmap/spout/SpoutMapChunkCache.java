@@ -78,6 +78,7 @@ public class SpoutMapChunkCache implements MapChunkCache {
             initialize(x0, y0, z0);
             worldheight = SpoutWorld.WORLDHEIGHT;
         }
+        @Override
         public final void initialize(int x0, int y0, int z0) {
             this.x = x0;
             this.y = y0;
@@ -95,9 +96,11 @@ public class SpoutMapChunkCache implements MapChunkCache {
             snapsky = ffbyte;
             laststep = BlockStep.Y_MINUS;
         }
+        @Override
         public final int getBlockTypeID() {
             return blkidmap[snapids[off]];
         }
+        @Override
         public final int getBlockData() {
             return snapdata[off] & 0xF;//TODO - is this right?
         }
@@ -110,29 +113,25 @@ public class SpoutMapChunkCache implements MapChunkCache {
                 return EMPTY;
             }
         }
+        @Override
         public int getBlockSkyLight() {
             int light = snapsky[off >> 1];
             return 0x0F & (light >> (4 - (4 * (off & 1))));
         }
+        @Override
         public final int getBlockEmittedLight() {
             int light = snapemit[off >> 1];
             return 0x0F & (light >> (4 - (4 * (off & 1))));
         }
+        @Override
         public final BiomeMap getBiome() {
             //TODO
             return BiomeMap.NULL;
         }
-        public double getRawBiomeTemperature() {
-            //TODO
-            return 0.5;
-        }
-        public double getRawBiomeRainfall() {
-            //TODO
-            return 0.5;
-        }
         /**
          * Step current position in given direction
          */
+        @Override
         public final void stepPosition(BlockStep step) {
             switch(step.ordinal()) {
             case 0:
@@ -261,6 +260,7 @@ public class SpoutMapChunkCache implements MapChunkCache {
         /**
          * Unstep current position to previous position
          */
+        @Override
         public BlockStep unstepPosition() {
             BlockStep ls = laststep;
             stepPosition(unstep[ls.ordinal()]);
@@ -269,9 +269,11 @@ public class SpoutMapChunkCache implements MapChunkCache {
         /**
          * Unstep current position in oppisite director of given step
          */
+        @Override
         public void unstepPosition(BlockStep s) {
             stepPosition(unstep[s.ordinal()]);
         }
+        @Override
         public final void setY(int y) {
             if(y > this.y)
                 laststep = BlockStep.Y_PLUS;
@@ -279,15 +281,19 @@ public class SpoutMapChunkCache implements MapChunkCache {
                 laststep = BlockStep.Y_MINUS;
             this.y = y;
         }
+        @Override
         public final int getX() {
             return x;
         }
+        @Override
         public final int getY() {
             return y;
         }
+        @Override
         public final int getZ() {
             return z;
         }
+        @Override
         public final int getBlockTypeIDAt(BlockStep s) {
             BlockStep ls = laststep;
             stepPosition(s);
@@ -296,45 +302,49 @@ public class SpoutMapChunkCache implements MapChunkCache {
             laststep = ls;
             return tid;
         }
+        @Override
         public BlockStep getLastStep() {
             return laststep;
         }
+        @Override
         public int getWorldHeight() {
             return worldheight;
         }
+        @Override
         public long getBlockKey() {
             return (((chunkindex * worldheight) + y) << 8) | (bx << 4) | bz;
         }
+        @Override
         public boolean isEmptySection() {
             return (snap == EMPTY);
         }
-        public int getSmoothGrassColorMultiplier(int[] colormap, int width) {
-            // TODO
+        @Override
+        public int getSmoothGrassColorMultiplier(int[] colormap) {
             BiomeMap bm = getBiome();
-            return bm.getModifiedGrassMultiplier(colormap[bm.biomeLookup(width)]);
+            return bm.getModifiedGrassMultiplier(colormap[bm.biomeLookup()]);
         }
-        public int getSmoothFoliageColorMultiplier(int[] colormap, int width) {
-            // TODO Auto-generated method stub
+        @Override
+        public int getSmoothFoliageColorMultiplier(int[] colormap) {
             BiomeMap bm = getBiome();
-            return bm.getModifiedFoliageMultiplier(colormap[bm.biomeLookup(width)]);
+            return bm.getModifiedFoliageMultiplier(colormap[bm.biomeLookup()]);
         }
-        public int getSmoothColorMultiplier(int[] colormap, int width, int[] swampmap, int swampwidth) {
-            // TODO Auto-generated method stub
+        @Override
+        public int getSmoothColorMultiplier(int[] colormap, int[] swampmap) {
             BiomeMap bm = getBiome();
             if(bm == BiomeMap.SWAMPLAND)
-                return swampmap[bm.biomeLookup(swampwidth)];
+                return swampmap[bm.biomeLookup()];
             else
-                return colormap[bm.biomeLookup(width)];
+                return colormap[bm.biomeLookup()];
         }
+        @Override
         public int getSmoothWaterColorMultiplier() {
-            // TODO Auto-generated method stub
             BiomeMap bm = getBiome();
             return bm.getWaterColorMult();
         }
-        public int getSmoothWaterColorMultiplier(int[] colormap, int width) {
-            // TODO Auto-generated method stub
+        @Override
+        public int getSmoothWaterColorMultiplier(int[] colormap) {
             BiomeMap bm = getBiome();
-            return colormap[bm.biomeLookup(width)];
+            return colormap[bm.biomeLookup()];
         }
         @Override
         public RenderPatchFactory getPatchFactory() {
@@ -386,9 +396,11 @@ public class SpoutMapChunkCache implements MapChunkCache {
         public EmptySnapshot(World world, float x, float y, float z) {
             super(world, x, y, z);
         }
+        @Override
         public BlockMaterial getBlockMaterial(int x, int y, int z) {
             return null;
         }
+        @Override
         public short getBlockData(int x, int y, int z) {
             return 0;
         }
@@ -396,7 +408,6 @@ public class SpoutMapChunkCache implements MapChunkCache {
         public short[] getBlockIds() {
             return zero;
         }
-
         @Override
         public short[] getBlockData() {
             return zero;
@@ -405,6 +416,7 @@ public class SpoutMapChunkCache implements MapChunkCache {
         public Region getRegion() {
             return null;
         }
+        @Override
         public byte getBlockLight(int x, int y, int z) {
             return 0;
         }
@@ -416,6 +428,7 @@ public class SpoutMapChunkCache implements MapChunkCache {
         public byte[] getSkyLight() {
             return ffbyte;
         }
+        @Override
         public byte getBlockSkyLight(int x, int y, int z) {
             return 0xF;
         }
