@@ -517,6 +517,7 @@ public class DynmapPlugin extends CommonPlugin implements DynmapCommonAPI {
         if(core == null)
             core = new DynmapCore();
         /* Inject dependencies */
+        core.setPluginJarFile(this.getFile());
         core.setPluginVersion(version, "Spout");
         core.setMinecraftVersion(mcver);
         core.setDataFolder(dataDirectory);
