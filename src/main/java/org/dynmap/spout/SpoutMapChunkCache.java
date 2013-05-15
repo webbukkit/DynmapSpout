@@ -8,7 +8,6 @@ import java.util.ListIterator;
 import org.dynmap.DynmapChunk;
 import org.dynmap.DynmapCore;
 import org.dynmap.DynmapWorld;
-import org.dynmap.Log;
 import org.dynmap.common.BiomeMap;
 import org.dynmap.hdmap.HDBlockModels;
 import org.dynmap.renderer.RenderPatchFactory;
@@ -470,6 +469,10 @@ public class SpoutMapChunkCache implements MapChunkCache {
         }
         @Override
         public CuboidLightBuffer[] getLightBuffers() {
+            return null;
+        }
+        @Override
+        public CuboidLightBuffer getLightBuffer(short arg0) {
             return null;
         }
     }
