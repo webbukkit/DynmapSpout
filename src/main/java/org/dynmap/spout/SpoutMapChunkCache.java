@@ -464,10 +464,6 @@ public class SpoutMapChunkCache implements MapChunkCache {
             return null;
         }
         @Override
-        public BlockComponent getBlockComponent(int arg0, int arg1, int arg2) {
-            return null;
-        }
-        @Override
         public CuboidLightBuffer[] getLightBuffers() {
             return null;
         }
